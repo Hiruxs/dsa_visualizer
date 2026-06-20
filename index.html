@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DSA Visualizer — Learn Data Structures & Algorithms</title>
+<link rel="stylesheet" href="css/style.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+<nav class="navbar">
+  <div class="nav-brand">
+    <span class="brand-icon">&lt;/&gt;</span>
+    <span class="brand-name">DSA Visualizer</span>
+  </div>
+  <div class="nav-links">
+    <a href="#data-structures">Data Structures</a>
+    <a href="#algorithms">Algorithms</a>
+  </div>
+</nav>
+
+<header class="hero">
+  <div class="hero-bg">
+    <div class="grid-lines"></div>
+  </div>
+  <div class="hero-content">
+    <div class="hero-badge">Interactive Learning</div>
+    <h1>Understand <span class="highlight">Data Structures</span><br>& <span class="highlight">Algorithms</span> Visually</h1>
+    <p class="hero-sub">Step through every operation, watch how memory changes, and build real intuition — not just memorization.</p>
+    <div class="hero-actions">
+      <a href="#data-structures" class="btn-primary">Explore Data Structures</a>
+      <a href="#algorithms" class="btn-ghost">See Algorithms</a>
+    </div>
+    <div class="hero-stats">
+      <div class="stat"><span class="stat-num">12</span><span class="stat-label">Data Structures</span></div>
+      <div class="stat-divider"></div>
+      <div class="stat"><span class="stat-num">14</span><span class="stat-label">Algorithms</span></div>
+      <div class="stat-divider"></div>
+      <div class="stat"><span class="stat-num">100%</span><span class="stat-label">Interactive</span></div>
+    </div>
+  </div>
+</header>
+
+<main>
+  <section id="data-structures" class="section">
+    <div class="section-header">
+      <div class="section-tag">Part 1</div>
+      <h2>Data Structures</h2>
+      <p>How data is organized and stored in memory</p>
+    </div>
+    <div class="cards-grid">
+      <a href="pages/array.html" class="card">
+        <div class="card-icon" style="background:#1e3a5f">[ ]</div>
+        <div class="card-body"><h3>Array</h3><p>Store elements in contiguous memory locations with index-based access.</p></div>
+        <span class="card-arrow">→</span>
+      </a>
+      <a href="pages/stack.html" class="card">
+        <div class="card-icon" style="background:#1a3a2a">⊟</div>
+        <div class="card-body"><h3>Stack</h3><p>Last In, First Out (LIFO) — like a pile of plates.</p></div>
+        <span class="card-arrow">→</span>
+      </a>
+      <a href="pages/queue.html" class="card">
+        <div class="card-icon" style="background:#2a1a3a">⊡</div>
+        <div class="card-body"><h3>Queue</h3><p>First In, First Out (FIFO) — like a line at a shop.</p></div>
+        <span class="card-arrow">→</span>
+      </a>
+      <a href="pages/circular-queue.html" class="card">
+        <div class="card-icon" style="background:#2a2a1a">↺</div>
+        <div class="card-body"><h3>Circular Queue</h3><p>A queue that wraps around — reuses empty slots efficiently.</p></div>
+        <span class="card-arrow">→</span>
+      </a>
+      <a href="pages/linked-list.html" class="card">
+        <div class="card-icon" style="background:#1e3a5f">⬡</div>
+        <div class="card-body"><h3>Linked List</h3><p>Nodes connected by pointers — dynamic size, no contiguous memory needed.</p></div>
+        <span class="card-arrow">→</span>
+      </a>
+      <a href="pages/binary-tree.html" class="card">
+        <div class="card-icon" style="background:#1a3a2a">△</div>
+        <div class="card-body"><h3>Binary Tree</h3><p>Each node has at most two children — left and right.</p></div>
+        <span class="card-arrow">→</span>
+      </a>
+      <a href="pages/bst.html" class="card">
+        <div class="card-icon" style="background:#2a1a3a">⊛</div>
+        <div class="card-body"><h3>Binary Search Tree</h3><p>Left &lt; Root &lt; Right — enables fast search in O(log n).</p></div>
+        <span class="card-arrow">→</span>
+      </a>
+      <a href="pages/complete-binary-tree.html" class="card">
+        <div class="card-icon" style="background:#1e3a5f">▽</div>
+        <div class="card-body"><h3>Complete Binary Tree</h3><p>All levels filled except possibly the last, filled left to right.</p></div>
+        <span class="card-arrow">→</span>
+      </a>
+      <a href="pages/full-binary-tree.html" class="card">
+        <div class="card-icon" style="background:#2a2a1a">◈</div>
+        <div class="card-body"><h3>Full Binary Tree</h3><p>Every node has either 0 or 2 children — never just one.</p></div>
+        <span class="card-arrow">→</span>
+      </a>
+      <a href="pages/heap.html" class="card">
+        <div class="card-icon" style="background:#1a3a2a">⬠</div>
+        <div class="card-body"><h3>Heap</h3><p>A complete binary tree satisfying the heap property.</p></div>
+        <span class="card-arrow">→</span>
+      </a>
+      <a href="pages/max-heap.html" class="card">
+        <div class="card-icon" style="background:#2a1a3a">▲</div>
+        <div class="card-body"><h3>Max Heap</h3><p>Parent is always greater than or equal to its children.</p></div>
+        <span class="card-arrow">→</span>
+      </a>
+      <a href="pages/min-heap.html" class="card">
+        <div class="card-icon" style="background:#1e3a5f">▼</div>
+        <div class="card-body"><h3>Min Heap</h3><p>Parent is always less than or equal to its children.</p></div>
+        <span class="card-arrow">→</span>
+      </a>
+    </div>
+  </section>
+
+  <section id="algorithms" class="section">
+    <div class="section-header">
+      <div class="section-tag">Part 2</div>
+      <h2>Algorithms</h2>
+      <p>Step-by-step procedures for solving problems</p>
+    </div>
+    <div class="cards-grid">
+      <a href="pages/insertion-sort.html" class="card">
+        <div class="card-icon" style="background:#1e3a5f">↑</div>
+        <div class="card-body"><h3>Insertion Sort</h3><p>Build sorted array one element at a time by inserting into correct position.</p></div>
+        <span class="card-arrow">→</span>
+      </a>
+      <a href="pages/bubble-sort.html" class="card">
+        <div class="card-icon" style="background:#1a3a2a">⬆</div>
+        <div class="card-body"><h3>Bubble Sort</h3><p>Repeatedly swap adjacent elements until the array is sorted.</p></div>
+        <span class="card-arrow">→</span>
+      </a>
+      <a href="pages/quick-sort.html" class="card">
+        <div class="card-icon" style="background:#2a1a3a">⚡</div>
+        <div class="card-body"><h3>Quick Sort</h3><p>Divide and conquer using a pivot to partition the array.</p></div>
+        <span class="card-arrow">→</span>
+      </a>
+      <a href="pages/merge-sort.html" class="card">
+        <div class="card-icon" style="background:#2a2a1a">⊕</div>
+        <div class="card-body"><h3>Merge Sort</h3><p>Split, sort recursively, then merge — always O(n log n).</p></div>
+        <span class="card-arrow">→</span>
+      </a>
+      <a href="pages/heap-sort.html" class="card">
+        <div class="card-icon" style="background:#1a3a2a">⊗</div>
+        <div class="card-body"><h3>Heap Sort</h3><p>Sort by building a max heap and extracting the maximum repeatedly.</p></div>
+        <span class="card-arrow">→</span>
+      </a>
+      <a href="pages/linear-search.html" class="card">
+        <div class="card-icon" style="background:#1e3a5f">⌕</div>
+        <div class="card-body"><h3>Linear Search</h3><p>Check each element one by one until the target is found.</p></div>
+        <span class="card-arrow">→</span>
+      </a>
+      <a href="pages/tree-traversal.html" class="card">
+        <div class="card-icon" style="background:#2a1a3a">⤵</div>
+        <div class="card-body"><h3>Tree Traversal</h3><p>Visit every node in a tree in a specific order.</p></div>
+        <span class="card-arrow">→</span>
+      </a>
+      <a href="pages/inorder.html" class="card">
+        <div class="card-icon" style="background:#2a2a1a">L→R</div>
+        <div class="card-body"><h3>Inorder Traversal</h3><p>Left → Root → Right — gives sorted output for a BST.</p></div>
+        <span class="card-arrow">→</span>
+      </a>
+      <a href="pages/preorder.html" class="card">
+        <div class="card-icon" style="background:#1e3a5f">R→</div>
+        <div class="card-body"><h3>Preorder Traversal</h3><p>Root → Left → Right — useful for copying a tree.</p></div>
+        <span class="card-arrow">→</span>
+      </a>
+      <a href="pages/postorder.html" class="card">
+        <div class="card-icon" style="background:#1a3a2a">→R</div>
+        <div class="card-body"><h3>Postorder Traversal</h3><p>Left → Right → Root — useful for deleting a tree.</p></div>
+        <span class="card-arrow">→</span>
+      </a>
+      <a href="pages/recursion.html" class="card">
+        <div class="card-icon" style="background:#2a1a3a">∞</div>
+        <div class="card-body"><h3>Recursion</h3><p>A function that calls itself to solve smaller subproblems.</p></div>
+        <span class="card-arrow">→</span>
+      </a>
+      <a href="pages/divide-conquer.html" class="card">
+        <div class="card-icon" style="background:#2a2a1a">÷</div>
+        <div class="card-body"><h3>Divide & Conquer</h3><p>Break the problem into smaller parts, solve each, then combine.</p></div>
+        <span class="card-arrow">→</span>
+      </a>
+      <a href="pages/build-max-heap.html" class="card">
+        <div class="card-icon" style="background:#1a3a2a">⊞</div>
+        <div class="card-body"><h3>Build Max Heap</h3><p>Convert an unsorted array into a valid max heap in O(n).</p></div>
+        <span class="card-arrow">→</span>
+      </a>
+      <a href="pages/max-heapify.html" class="card">
+        <div class="card-icon" style="background:#1e3a5f">⊡</div>
+        <div class="card-body"><h3>Max Heapify</h3><p>Fix a single violation of the max heap property by sifting down.</p></div>
+        <span class="card-arrow">→</span>
+      </a>
+    </div>
+  </section>
+</main>
+
+<footer class="footer">
+  <div class="footer-inner">
+    <span class="brand-name">&lt;/&gt; DSA Visualizer</span>
+    <span>Built for students who want to truly understand, not just pass.</span>
+  </div>
+</footer>
+<script src="js/main.js"></script>
+</body>
+</html>

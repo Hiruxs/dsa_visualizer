@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Stack — DSA Visualizer</title>
+<link rel="stylesheet" href="../css/style.css">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+<nav class="navbar"><div class="nav-brand"><span class="brand-icon">&lt;/&gt;</span><span class="brand-name">DSA Visualizer</span></div><div class="nav-links"><a href="../index.html#data-structures">Data Structures</a><a href="../index.html#algorithms">Algorithms</a></div></nav>
+<div class="viz-page">
+  <div class="viz-header">
+    <a href="../index.html" class="back-link">← Back to Home</a>
+    <h1>Stack</h1>
+    <p class="subtitle">A Last In, First Out (LIFO) data structure — like a stack of plates.</p>
+    <div class="complexity-badges"><span class="badge badge-green">Push O(1)</span><span class="badge badge-green">Pop O(1)</span><span class="badge badge-green">Peek O(1)</span></div>
+  </div>
+  <div class="viz-layout">
+    <div>
+      <div class="viz-panel">
+        <div class="panel-title">Visualization — Stack grows upward</div>
+        <div class="viz-canvas" style="flex-direction:column;align-items:center;gap:0.5rem">
+          <div style="font-size:0.75rem;color:var(--text-muted);font-family:var(--font-mono)">← TOP (last in, first out)</div>
+          <div class="stack-viz" id="stackViz" style="padding:0.5rem 0"></div>
+          <div style="width:148px;height:3px;background:var(--border);border-radius:2px"></div>
+          <div style="font-size:0.72rem;color:var(--text-muted)">Bottom of Stack</div>
+        </div>
+        <div class="controls">
+          <div class="control-row">
+            <input class="ctrl-input" id="stackVal" type="number" placeholder="Value" min="0" max="99">
+            <button class="ctrl-btn" onclick="stackPush()">Push</button>
+            <button class="ctrl-btn danger" onclick="stackPop()">Pop</button>
+            <button class="ctrl-btn secondary" onclick="stackPeek()">Peek</button>
+          </div>
+          <div class="control-row"><button class="ctrl-btn secondary" onclick="stackReset()">Reset</button></div>
+        </div>
+        <div class="info-log" id="stackLog"><div class="log-entry">Stack has 3 elements. TOP is 30.</div></div>
+      </div>
+      <div class="explanation" style="margin-top:1rem">
+        <p><strong>Real-world uses:</strong> Browser back button (each page is pushed; back pops), undo operations in editors, function call stack in programming, and expression evaluation.</p>
+      </div>
+    </div>
+    <div>
+      <div class="viz-panel">
+        <div class="panel-title">Code</div>
+        <div class="code-panel"><pre><span class="kw">class</span> <span class="fn">Stack</span> {
+  <span class="fn">constructor</span>() {
+    <span class="kw">this</span>.items = [];
+  }
+
+  <span class="fn">push</span>(val) {
+    <span class="kw">this</span>.items.<span class="fn">push</span>(val);
+    <span class="cm">// O(1)</span>
+  }
+
+  <span class="fn">pop</span>() {
+    <span class="kw">if</span> (<span class="kw">this</span>.<span class="fn">isEmpty</span>()) <span class="kw">return</span> <span class="nm">null</span>;
+    <span class="kw">return this</span>.items.<span class="fn">pop</span>();
+    <span class="cm">// O(1)</span>
+  }
+
+  <span class="fn">peek</span>() {
+    <span class="kw">return this</span>.items[
+      <span class="kw">this</span>.items.length - <span class="nm">1</span>
+    ]; <span class="cm">// O(1)</span>
+  }
+
+  <span class="fn">isEmpty</span>() {
+    <span class="kw">return this</span>.items.length === <span class="nm">0</span>;
+  }
+}</pre></div>
+        <div class="panel-title" style="margin-top:1rem">Key Concept</div>
+        <div class="stepper" style="padding:1rem">
+          <div class="step-item active-step"><div class="step-num">↑</div><div class="step-text"><strong>Push:</strong> Add to the TOP of the stack</div></div>
+          <div class="step-item"><div class="step-num">↓</div><div class="step-text"><strong>Pop:</strong> Remove from the TOP only</div></div>
+          <div class="step-item"><div class="step-num">👁</div><div class="step-text"><strong>Peek:</strong> See the TOP without removing it</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<script>
+let stack = [10, 20, 30];
+
+function render() {
+  const viz = document.getElementById('stackViz');
+  if (stack.length === 0) { viz.innerHTML = '<div style="color:var(--text-muted);font-size:0.85rem">Stack is empty</div>'; return; }
+  viz.innerHTML = [...stack].reverse().map((v, i) => `
+    <div class="stack-cell ${i===0?'top':''}">
+      <span>${v}</span>
+      <span class="stack-label">${i===0?'TOP':''}</span>
+    </div>`).join('');
+}
+
+function log(msg, type='') {
+  const el = document.getElementById('stackLog');
+  el.innerHTML = `<div class="log-entry ${type}">${msg}</div>` + el.innerHTML;
+}
+
+function stackPush() {
+  const val = parseInt(document.getElementById('stackVal').value);
+  if (isNaN(val)) { log('Enter a value to push.'); return; }
+  if (stack.length >= 6) { log('Stack is full (max 6 elements shown).'); return; }
+  stack.push(val);
+  log(`Pushed <strong>${val}</strong> onto the stack. New TOP = ${val}`, 'highlight');
+  render();
+}
+
+function stackPop() {
+  if (stack.length === 0) { log('Stack underflow! Cannot pop from empty stack.'); return; }
+  const val = stack.pop();
+  log(`Popped <strong>${val}</strong> from the stack. New TOP = ${stack.length > 0 ? stack[stack.length-1] : 'empty'}`, 'highlight');
+  render();
+}
+
+function stackPeek() {
+  if (stack.length === 0) { log('Stack is empty.'); return; }
+  log(`Peek → TOP is <strong>${stack[stack.length-1]}</strong>. Stack unchanged.`, 'success-log');
+  render();
+}
+
+function stackReset() { stack = [10, 20, 30]; render(); log('Stack reset.'); }
+render();
+</script>
+</body></html>

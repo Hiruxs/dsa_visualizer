@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Linear Search — DSA Visualizer</title>
+<link rel="stylesheet" href="../css/style.css">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+<nav class="navbar"><div class="nav-brand"><span class="brand-icon">&lt;/&gt;</span><span class="brand-name">DSA Visualizer</span></div><div class="nav-links"><a href="../index.html#data-structures">Data Structures</a><a href="../index.html#algorithms">Algorithms</a></div></nav>
+<div class="viz-page">
+  <div class="viz-header">
+    <a href="../index.html" class="back-link">← Back to Home</a>
+    <h1>Linear Search</h1>
+    <p class="subtitle">Check each element one by one from the beginning until the target is found.</p>
+    <div class="complexity-badges"><span class="badge badge-yellow">Time O(n)</span><span class="badge badge-green">Space O(1)</span><span class="badge badge-green">Best O(1)</span></div>
+  </div>
+  <div class="viz-layout">
+    <div>
+      <div class="viz-panel">
+        <div class="panel-title">Visualization</div>
+        <div class="viz-canvas" style="flex-direction:column;gap:1.5rem">
+          <div class="array-viz" id="lsViz"></div>
+        </div>
+        <div class="controls">
+          <div class="control-row">
+            <input class="ctrl-input" id="lsTarget" type="number" placeholder="Search for...">
+            <button class="ctrl-btn" onclick="startSearch()">▶ Search</button>
+            <button class="ctrl-btn secondary" onclick="lsReset()">Reset</button>
+          </div>
+          <div class="speed-row"><span>Speed:</span><input type="range" id="lsSpeed" min="200" max="1200" value="600"><span>Fast</span></div>
+        </div>
+        <div class="info-log" id="lsLog"><div class="log-entry">Enter a value and press Search to begin.</div></div>
+      </div>
+      <div class="explanation" style="margin-top:1rem">
+        <p><strong>Linear Search</strong> works on <strong>any array</strong> — sorted or unsorted. It scans from index 0 to the end, comparing each element with the target. Simple but slow for large datasets. Use <strong>Binary Search</strong> for sorted arrays to get O(log n) instead.</p>
+      </div>
+    </div>
+    <div>
+      <div class="viz-panel">
+        <div class="panel-title">Code</div>
+        <div class="code-panel"><pre><span class="kw">function</span> <span class="fn">linearSearch</span>(arr, target) {
+  <span class="kw">for</span> (<span class="kw">let</span> i = <span class="nm">0</span>; i &lt; arr.length; i++) {
+    <span class="cm">// Check each element</span>
+    <span class="kw">if</span> (arr[i] === target) {
+      <span class="kw">return</span> i; <span class="cm">// Found at i</span>
+    }
+  }
+  <span class="kw">return</span> <span class="nm">-1</span>; <span class="cm">// Not found</span>
+}
+<span class="cm">// Time:  O(n)
+// Space: O(1)
+// Best:  O(1) — found at index 0
+// Worst: O(n) — last element or not found</span></pre></div>
+        <div class="panel-title" style="margin-top:1rem">When to use</div>
+        <div class="stepper" style="padding:1rem">
+          <div class="step-item active-step"><div class="step-num">✓</div><div class="step-text">Array is small or unsorted</div></div>
+          <div class="step-item active-step"><div class="step-num">✓</div><div class="step-text">Works on any data type</div></div>
+          <div class="step-item"><div class="step-num">✗</div><div class="step-text">Avoid for large sorted arrays — use Binary Search</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<script>
+let lsArr = [43,12,67,8,35,91,25,56];
+let currentIdx = -1, foundIdx = -1, searching = false;
+
+function render(compare=-1, found=-1) {
+  const viz = document.getElementById('lsViz');
+  viz.innerHTML = lsArr.map((v,i) => {
+    let cls = 'arr-cell';
+    if (i===found) cls += ' found';
+    else if (i===compare) cls += ' active';
+    else if (found===-1 && compare>-1 && i<compare) cls += ' compare';
+    return `<div class="${cls}" style="width:44px;height:44px">${v}<span class="idx">${i}</span></div>`;
+  }).join('');
+}
+
+function log(msg,type='') { const el=document.getElementById('lsLog'); el.innerHTML=`<div class="log-entry ${type}">${msg}</div>`+el.innerHTML; }
+
+async function startSearch() {
+  if (searching) return;
+  const target = parseInt(document.getElementById('lsTarget').value);
+  if (isNaN(target)) { log('Enter a target value.'); return; }
+  searching=true; foundIdx=-1;
+  log(`Searching for <strong>${target}</strong>...`);
+  const speed = 1300 - parseInt(document.getElementById('lsSpeed').value);
+  for (let i=0; i<lsArr.length; i++) {
+    render(i,-1);
+    log(`Checking index ${i}: ${lsArr[i]} === ${target}? ${lsArr[i]===target?'✓ YES!':'✗ No'}`, lsArr[i]===target?'success-log':'');
+    await new Promise(r=>setTimeout(r,speed));
+    if (lsArr[i]===target) { render(i,i); log(`<strong>Found ${target} at index ${i}!</strong> Took ${i+1} comparison(s).`,'success-log'); searching=false; return; }
+  }
+  render(-1,-1); log(`<strong>${target} not found</strong>. Checked all ${lsArr.length} elements.`); searching=false;
+}
+
+function lsReset() { searching=false; lsArr=[43,12,67,8,35,91,25,56]; render(); log('Array reset.'); }
+render();
+</script>
+</body></html>

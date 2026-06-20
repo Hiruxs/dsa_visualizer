@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Linked List — DSA Visualizer</title>
+<link rel="stylesheet" href="../css/style.css">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+<nav class="navbar"><div class="nav-brand"><span class="brand-icon">&lt;/&gt;</span><span class="brand-name">DSA Visualizer</span></div><div class="nav-links"><a href="../index.html#data-structures">Data Structures</a><a href="../index.html#algorithms">Algorithms</a></div></nav>
+<div class="viz-page">
+  <div class="viz-header">
+    <a href="../index.html" class="back-link">← Back to Home</a>
+    <h1>Linked List</h1>
+    <p class="subtitle">A chain of nodes where each node holds data and a pointer to the next node.</p>
+    <div class="complexity-badges"><span class="badge badge-green">Insert Head O(1)</span><span class="badge badge-blue">Search O(n)</span><span class="badge badge-yellow">Insert Middle O(n)</span></div>
+  </div>
+  <div class="viz-layout">
+    <div>
+      <div class="viz-panel">
+        <div class="panel-title">Visualization</div>
+        <div class="viz-canvas" style="flex-direction:column;gap:0.5rem;overflow-x:auto">
+          <div style="font-size:0.7rem;color:var(--text-muted);margin-bottom:0.3rem">HEAD</div>
+          <div class="ll-viz" id="llViz" style="flex-wrap:wrap;gap:4px 0"></div>
+        </div>
+        <div class="controls">
+          <div class="control-row">
+            <input class="ctrl-input" id="llVal" type="number" placeholder="Value">
+            <button class="ctrl-btn" onclick="llPrepend()">Add Head</button>
+            <button class="ctrl-btn secondary" onclick="llAppend()">Add Tail</button>
+          </div>
+          <div class="control-row">
+            <button class="ctrl-btn danger" onclick="llDeleteHead()">Del Head</button>
+            <button class="ctrl-btn danger" onclick="llDeleteTail()">Del Tail</button>
+            <button class="ctrl-btn secondary" onclick="llSearch()">Search</button>
+          </div>
+        </div>
+        <div class="info-log" id="llLog"><div class="log-entry">Linked list with 4 nodes. HEAD → 10 → 20 → 30 → 40 → NULL</div></div>
+      </div>
+      <div class="explanation" style="margin-top:1rem">
+        <p><strong>Key difference from arrays:</strong> Nodes are <strong>not stored in contiguous memory</strong>. Each node stores a pointer to the next. This means insertion/deletion at head is O(1) — no shifting needed. But accessing the Nth element requires traversing from HEAD.</p>
+      </div>
+    </div>
+    <div>
+      <div class="viz-panel">
+        <div class="panel-title">Node Structure</div>
+        <div class="code-panel"><pre><span class="kw">class</span> <span class="fn">Node</span> {
+  <span class="fn">constructor</span>(val) {
+    <span class="kw">this</span>.data = val;
+    <span class="kw">this</span>.next = <span class="nm">null</span>;
+  }
+}
+
+<span class="kw">class</span> <span class="fn">LinkedList</span> {
+  <span class="fn">constructor</span>() {
+    <span class="kw">this</span>.head = <span class="nm">null</span>;
+  }
+
+  <span class="fn">prepend</span>(val) {
+    <span class="kw">let</span> node = <span class="kw">new</span> <span class="fn">Node</span>(val);
+    node.next = <span class="kw">this</span>.head;
+    <span class="kw">this</span>.head = node;
+    <span class="cm">// O(1)</span>
+  }
+
+  <span class="fn">append</span>(val) {
+    <span class="cm">// Traverse to end O(n)</span>
+    <span class="kw">let</span> node = <span class="kw">new</span> <span class="fn">Node</span>(val);
+    <span class="kw">if</span> (!<span class="kw">this</span>.head) {
+      <span class="kw">this</span>.head = node; <span class="kw">return</span>;
+    }
+    <span class="kw">let</span> cur = <span class="kw">this</span>.head;
+    <span class="kw">while</span> (cur.next) cur = cur.next;
+    cur.next = node;
+  }
+}</pre></div>
+      </div>
+    </div>
+  </div>
+</div>
+<script>
+let ll = [10, 20, 30, 40];
+let highlighted = -1;
+
+function render() {
+  const viz = document.getElementById('llViz');
+  if (ll.length === 0) { viz.innerHTML = '<div style="color:var(--text-muted)">Empty list → NULL</div>'; return; }
+  viz.innerHTML = ll.map((v, i) => `
+    <div class="ll-node">
+      <div style="display:flex;flex-direction:column;align-items:center">
+        ${i===0?'<div class="ll-head-label">HEAD</div>':''}
+        <div class="ll-box ${i===0?'head-node':''} ${i===highlighted?'active':''}">
+          <div class="ll-data">${v}</div>
+          <div class="ll-next">→</div>
+        </div>
+      </div>
+      <div class="ll-arrow">→</div>
+    </div>`).join('') + '<div class="ll-null">NULL</div>';
+}
+
+function log(msg, type='') {
+  const el = document.getElementById('llLog');
+  el.innerHTML = `<div class="log-entry ${type}">${msg}</div>` + el.innerHTML;
+}
+
+function llPrepend() {
+  const val = parseInt(document.getElementById('llVal').value);
+  if (isNaN(val)) { log('Enter a value.'); return; }
+  ll.unshift(val); highlighted=0;
+  log(`Added <strong>${val}</strong> at HEAD. O(1) — no traversal needed.`, 'highlight');
+  render(); setTimeout(()=>{highlighted=-1;render();},1500);
+}
+function llAppend() {
+  const val = parseInt(document.getElementById('llVal').value);
+  if (isNaN(val)) { log('Enter a value.'); return; }
+  ll.push(val); highlighted=ll.length-1;
+  log(`Added <strong>${val}</strong> at TAIL. Traversed ${ll.length-1} nodes. O(n)`, 'highlight');
+  render(); setTimeout(()=>{highlighted=-1;render();},1500);
+}
+function llDeleteHead() {
+  if (!ll.length) { log('List is empty.'); return; }
+  const v = ll.shift();
+  log(`Deleted HEAD node with value <strong>${v}</strong>. New HEAD = ${ll[0] ?? 'NULL'}. O(1)`, 'highlight');
+  render();
+}
+function llDeleteTail() {
+  if (!ll.length) { log('List is empty.'); return; }
+  const v = ll.pop();
+  log(`Deleted TAIL node with value <strong>${v}</strong>. O(n) — had to traverse to second-last.`, 'highlight');
+  render();
+}
+function llSearch() {
+  const val = parseInt(document.getElementById('llVal').value);
+  if (isNaN(val)) { log('Enter a value to search.'); return; }
+  const idx = ll.indexOf(val);
+  if (idx === -1) { log(`Value ${val} not found. Traversed all ${ll.length} nodes.`); return; }
+  highlighted = idx;
+  log(`Found <strong>${val}</strong> at position ${idx}. Took ${idx+1} steps from HEAD.`, 'success-log');
+  render(); setTimeout(()=>{highlighted=-1;render();},2000);
+}
+render();
+</script>
+</body></html>

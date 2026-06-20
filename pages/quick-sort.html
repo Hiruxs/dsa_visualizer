@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Quick Sort — DSA Visualizer</title>
+<link rel="stylesheet" href="../css/style.css">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+<nav class="navbar"><div class="nav-brand"><span class="brand-icon">&lt;/&gt;</span><span class="brand-name">DSA Visualizer</span></div><div class="nav-links"><a href="../index.html#data-structures">Data Structures</a><a href="../index.html#algorithms">Algorithms</a></div></nav>
+<div class="viz-page">
+  <div class="viz-header">
+    <a href="../index.html" class="back-link">← Back to Home</a>
+    <h1>Quick Sort</h1>
+    <p class="subtitle" id="subtitle"></p>
+    <div class="complexity-badges"><span class="badge badge-blue">Avg O(n log n)</span><span class="badge badge-yellow">Worst O(n²)</span><span class="badge badge-green">Space O(log n)</span></div>
+  </div>
+  <div class="viz-layout">
+    <div>
+      <div class="viz-panel">
+        <div class="panel-title">Visualization</div>
+        <div class="viz-canvas" style="flex-direction:column;gap:1rem">
+          <div class="bar-viz" id="barViz"></div>
+          <div class="array-viz" id="arrViz" style="margin-top:1rem"></div>
+        </div>
+        <div class="controls">
+          <div class="control-row">
+            <button class="ctrl-btn" onclick="startSort()" id="startBtn">▶ Start</button>
+            <button class="ctrl-btn secondary" onclick="resetArr()">Shuffle</button>
+            <button class="ctrl-btn secondary" onclick="stepSort()" id="stepBtn">Step →</button>
+          </div>
+          <div class="speed-row">
+            <span>Speed:</span>
+            <input type="range" id="speedSlider" min="100" max="1000" value="500">
+            <span>Fast</span>
+          </div>
+        </div>
+        <div class="info-log" id="sortLog"><div class="log-entry">Press Start to begin sorting, or Step to go one step at a time.</div></div>
+      </div>
+      <div class="explanation" style="margin-top:1rem">
+        <p><strong>How it works:</strong> Pick a pivot element. Rearrange the array so all elements smaller than the pivot go left, and all larger go right. Then recursively sort the left and right halves. Average case is O(n log n) — very fast in practice.</p>
+      </div>
+    </div>
+    <div>
+      <div class="viz-panel">
+        <div class="panel-title">Code</div>
+        <div class="code-panel"><pre><span class="kw">function</span> <span class="fn">quickSort</span>(arr, lo, hi) {
+  <span class="kw">if</span> (lo &gt;= hi) <span class="kw">return</span>;
+  <span class="kw">let</span> pivot = arr[hi];
+  <span class="kw">let</span> i = lo - <span class="nm">1</span>;
+  <span class="kw">for</span> (<span class="kw">let</span> j=lo; j&lt;hi; j++) {
+    <span class="kw">if</span> (arr[j] &lt;= pivot) {
+      i++;
+      [arr[i],arr[j]] = [arr[j],arr[i]];
+    }
+  }
+  <span class="cm">// Place pivot in final position</span>
+  [arr[i+<span class="nm">1</span>],arr[hi]] = [arr[hi],arr[i+<span class="nm">1</span>]];
+  <span class="kw">let</span> p = i + <span class="nm">1</span>;
+  <span class="fn">quickSort</span>(arr, lo, p-<span class="nm">1</span>);
+  <span class="fn">quickSort</span>(arr, p+<span class="nm">1</span>, hi);
+}
+<span class="cm">// Time:  O(n log n) avg
+// Space: O(log n)</span></pre></div>
+      </div>
+    </div>
+  </div>
+</div>
+<script>
+const ALGO = 'quick';
+let arr = [], steps = [], stepIdx = 0, playing = false, timer = null;
+
+function genArr() {
+  arr = Array.from({length:8}, ()=>Math.floor(Math.random()*80)+10);
+}
+
+function computeSteps() {
+  steps = [];
+  let a = [...arr];
+  if (ALGO === 'bubble') {
+    for (let i=0; i<a.length-1; i++) {
+      for (let j=0; j<a.length-i-1; j++) {
+        steps.push({arr:[...a], compare:[j,j+1], sorted:Array.from({length:i},(_,k)=>a.length-1-k), msg:`Comparing a[${j}]=${a[j]} and a[${j+1}]=${a[j+1]}`});
+        if (a[j]>a[j+1]) { [a[j],a[j+1]]=[a[j+1],a[j]]; steps.push({arr:[...a], swapped:[j,j+1], sorted:[], msg:`Swapped! ${a[j]} and ${a[j+1]} switched places.`}); }
+      }
+    }
+    steps.push({arr:[...a], sorted:a.map((_,i)=>i), msg:'Sorting complete!'});
+  } else if (ALGO === 'insertion') {
+    for (let i=1; i<a.length; i++) {
+      let key=a[i], j=i-1;
+      steps.push({arr:[...a], compare:[i], sorted:Array.from({length:i},(_,k)=>k), msg:`Picking key = ${key} at index ${i}`});
+      while (j>=0 && a[j]>key) { a[j+1]=a[j]; steps.push({arr:[...a], compare:[j,j+1], sorted:[], msg:`Shifting ${a[j]} right to make room for ${key}`}); j--; }
+      a[j+1]=key;
+      steps.push({arr:[...a], compare:[j+1], sorted:Array.from({length:i+1},(_,k)=>k), msg:`Inserted ${key} at position ${j+1}`});
+    }
+    steps.push({arr:[...a], sorted:a.map((_,i)=>i), msg:'Sorted!'});
+  } else if (ALGO === 'selection') {
+    for (let i=0; i<a.length-1; i++) {
+      let minIdx=i;
+      for (let j=i+1; j<a.length; j++) {
+        steps.push({arr:[...a], compare:[minIdx,j], sorted:Array.from({length:i},(_,k)=>k), msg:`Comparing min(${a[minIdx]}) with a[${j}]=${a[j]}`});
+        if (a[j]<a[minIdx]) minIdx=j;
+      }
+      [a[i],a[minIdx]]=[a[minIdx],a[i]];
+      steps.push({arr:[...a], swapped:[i,minIdx], sorted:Array.from({length:i+1},(_,k)=>k), msg:`Placed minimum ${a[i]} at index ${i}`});
+    }
+    steps.push({arr:[...a], sorted:a.map((_,i)=>i), msg:'Sorted!'});
+  } else {
+    // quick sort steps
+    function qs(arr, lo, hi, sorted) {
+      if (lo>=hi) return;
+      let pivot=arr[hi], i=lo-1;
+      steps.push({arr:[...arr], pivot:hi, compare:[lo,hi], sorted:[...sorted], msg:`Pivot = ${pivot} at index ${hi}`});
+      for (let j=lo; j<hi; j++) {
+        steps.push({arr:[...arr], pivot:hi, compare:[j,hi], sorted:[...sorted], msg:`Comparing ${arr[j]} with pivot ${pivot}`});
+        if (arr[j]<=pivot) { i++; [arr[i],arr[j]]=[arr[j],arr[i]]; steps.push({arr:[...arr], pivot:hi, swapped:[i,j], sorted:[...sorted], msg:`Swapped ${arr[i]} and ${arr[j]}`}); }
+      }
+      [arr[i+1],arr[hi]]=[arr[hi],arr[i+1]];
+      steps.push({arr:[...arr], pivot:i+1, sorted:[...sorted,i+1], msg:`Pivot ${arr[i+1]} placed at final position ${i+1}`});
+      qs(arr, lo, i, [...sorted,i+1]);
+      qs(arr, i+2, hi, [...sorted,i+1]);
+    }
+    qs([...a], 0, a.length-1, []);
+    steps.push({arr:[...a], sorted:a.map((_,i)=>i), msg:'Sorted!'});
+  }
+}
+
+const maxH = 140;
+function render(s) {
+  if (!s) s = {arr:arr, compare:[], sorted:[], msg:'Press Start or Step.'};
+  const bv = document.getElementById('barViz');
+  const av = document.getElementById('arrViz');
+  const mx = Math.max(...s.arr);
+  bv.innerHTML = s.arr.map((v,i) => {
+    let cls = 'bar';
+    if ((s.sorted||[]).includes(i)) cls += ' sorted-bar';
+    else if ((s.compare||[]).includes(i)) cls += ' comparing';
+    else if (s.pivot===i) cls += ' pivot-bar';
+    return `<div class="${cls}" style="height:${Math.max(20,(v/mx)*maxH)}px">${v}</div>`;
+  }).join('');
+  av.innerHTML = s.arr.map((v,i) => {
+    let cls = 'arr-cell';
+    if ((s.sorted||[]).includes(i)) cls += ' sorted';
+    else if ((s.compare||[]).includes(i)) cls += ' compare';
+    else if (s.pivot===i) cls += ' pivot';
+    return `<div class="${cls}" style="width:42px;height:42px">${v}</div>`;
+  }).join('');
+  if (s.msg) { const el = document.getElementById('sortLog'); el.innerHTML = `<div class="log-entry highlight">${s.msg}</div>` + el.innerHTML; }
+}
+
+function stepSort() {
+  if (steps.length === 0) computeSteps();
+  if (stepIdx < steps.length) { render(steps[stepIdx]); stepIdx++; }
+}
+
+function startSort() {
+  if (playing) { playing=false; clearTimeout(timer); document.getElementById('startBtn').textContent='▶ Start'; return; }
+  if (steps.length===0) computeSteps();
+  playing = true; document.getElementById('startBtn').textContent='⏸ Pause';
+  function next() {
+    if (!playing || stepIdx >= steps.length) { playing=false; document.getElementById('startBtn').textContent='▶ Start'; return; }
+    render(steps[stepIdx]); stepIdx++;
+    const speed = 1100 - parseInt(document.getElementById('speedSlider').value);
+    timer = setTimeout(next, speed);
+  }
+  next();
+}
+
+function resetArr() { genArr(); steps=[]; stepIdx=0; playing=false; clearTimeout(timer); document.getElementById('startBtn').textContent='▶ Start'; render({arr,compare:[],sorted:[],msg:'Shuffled! Press Start or Step.'}); }
+genArr(); render({arr,compare:[],sorted:[],msg:'Ready to sort.'});
+</script>
+</body></html>

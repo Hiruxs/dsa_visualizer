@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Binary Search Tree — DSA Visualizer</title>
+<link rel="stylesheet" href="../css/style.css">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+<nav class="navbar"><div class="nav-brand"><span class="brand-icon">&lt;/&gt;</span><span class="brand-name">DSA Visualizer</span></div><div class="nav-links"><a href="../index.html#data-structures">Data Structures</a><a href="../index.html#algorithms">Algorithms</a></div></nav>
+<div class="viz-page">
+  <div class="viz-header">
+    <a href="../index.html" class="back-link">← Back to Home</a>
+    <h1>Binary Search Tree</h1>
+    <p class="subtitle">For every node: left subtree has smaller values, right subtree has larger values.</p>
+    <div class="complexity-badges"><span class="badge badge-blue">Search O(log n)</span><span class="badge badge-blue">Insert O(log n)</span><span class="badge badge-yellow">Worst O(n)</span></div>
+  </div>
+  <div class="viz-layout">
+    <div>
+      <div class="viz-panel">
+        <div class="panel-title">Visualization</div>
+        <div class="viz-canvas"><div class="tree-viz"><svg id="treeSvg" width="420" height="240" viewBox="0 0 420 240"></svg></div></div>
+        <div class="controls">
+          <div class="control-row">
+            <input class="ctrl-input" id="bstVal" type="number" placeholder="Value (1-99)">
+            <button class="ctrl-btn" onclick="bstInsert()">Insert</button>
+            <button class="ctrl-btn secondary" onclick="bstSearch()">Search</button>
+          </div>
+          <div class="control-row"><button class="ctrl-btn secondary" onclick="bstReset()">Reset Tree</button></div>
+        </div>
+        <div class="info-log" id="bstLog"><div class="log-entry">BST initialized. Insert values and watch them place themselves.</div></div>
+      </div>
+      <div class="explanation" style="margin-top:1rem">
+        <p><strong>BST Property:</strong> At every node, all values in the <strong>left subtree are smaller</strong>, and all values in the <strong>right subtree are larger</strong>. This lets you eliminate half the tree at each step — like binary search.</p>
+      </div>
+    </div>
+    <div>
+      <div class="viz-panel">
+        <div class="panel-title">Code</div>
+        <div class="code-panel"><pre><span class="kw">function</span> <span class="fn">insert</span>(root, val) {
+  <span class="kw">if</span> (!root) <span class="kw">return new</span> <span class="fn">Node</span>(val);
+  <span class="kw">if</span> (val &lt; root.val)
+    root.left = <span class="fn">insert</span>(root.left, val);
+  <span class="kw">else if</span> (val &gt; root.val)
+    root.right = <span class="fn">insert</span>(root.right, val);
+  <span class="kw">return</span> root;
+}
+
+<span class="kw">function</span> <span class="fn">search</span>(root, val) {
+  <span class="kw">if</span> (!root) <span class="kw">return false</span>;
+  <span class="kw">if</span> (val === root.val) <span class="kw">return true</span>;
+  <span class="kw">if</span> (val &lt; root.val)
+    <span class="kw">return</span> <span class="fn">search</span>(root.left, val);
+  <span class="kw">return</span> <span class="fn">search</span>(root.right, val);
+  <span class="cm">// O(log n) average</span>
+}</pre></div>
+        <div class="panel-title" style="margin-top:1rem">BST Rules</div>
+        <div class="stepper" style="padding:1rem">
+          <div class="step-item active-step"><div class="step-num">&lt;</div><div class="step-text">Smaller values go to the LEFT child</div></div>
+          <div class="step-item"><div class="step-num">&gt;</div><div class="step-text">Larger values go to the RIGHT child</div></div>
+          <div class="step-item"><div class="step-num">=</div><div class="step-text">Equal values are typically ignored (no duplicates)</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<script>
+class Node { constructor(v){this.val=v;this.left=null;this.right=null;} }
+let root = null;
+let highlighted = null;
+
+function insert(r, v) {
+  if (!r) return new Node(v);
+  if (v < r.val) r.left = insert(r.left, v);
+  else if (v > r.val) r.right = insert(r.right, v);
+  return r;
+}
+
+function getPositions(node, x, y, gap, positions=[]) {
+  if (!node) return positions;
+  positions.push({val:node.val, x, y});
+  if (node.left) getPositions(node.left, x-gap, y+60, gap/2, positions);
+  if (node.right) getPositions(node.right, x+gap, y+60, gap/2, positions);
+  return positions;
+}
+
+function getEdges(node, x, y, gap, edges=[]) {
+  if (!node) return edges;
+  if (node.left) { edges.push({x1:x,y1:y,x2:x-gap,y2:y+60}); getEdges(node.left, x-gap, y+60, gap/2, edges); }
+  if (node.right) { edges.push({x1:x,y1:y,x2:x+gap,y2:y+60}); getEdges(node.right, x+gap, y+60, gap/2, edges); }
+  return edges;
+}
+
+function renderTree() {
+  const svg = document.getElementById('treeSvg');
+  if (!root) { svg.innerHTML = '<text x="210" y="120" text-anchor="middle" fill="#4a5568" font-size="14" font-family="Inter">Empty tree — insert a value</text>'; return; }
+  const cx=210, cy=30, gap=90;
+  const positions = getPositions(root, cx, cy, gap);
+  const edges = getEdges(root, cx, cy, gap);
+  svg.innerHTML = 
+    edges.map(e=>`<line x1="${e.x1}" y1="${e.y1}" x2="${e.x2}" y2="${e.y2}" class="edge-line"/>`).join('') +
+    positions.map(p=>`
+      <circle cx="${p.x}" cy="${p.y}" r="22" class="node-circle ${p.val===highlighted?'active-node':''}"/>
+      <text x="${p.x}" y="${p.y}" class="node-text" font-size="13">${p.val}</text>
+    `).join('');
+}
+
+function log(msg, type='') {
+  const el = document.getElementById('bstLog');
+  el.innerHTML = `<div class="log-entry ${type}">${msg}</div>` + el.innerHTML;
+}
+
+function bstInsert() {
+  const val = parseInt(document.getElementById('bstVal').value);
+  if (isNaN(val)||val<1||val>99) { log('Enter a value 1–99.'); return; }
+  root = insert(root, val);
+  highlighted = val;
+  log(`Inserted <strong>${val}</strong>. Compared with nodes from root to find correct spot.`, 'highlight');
+  renderTree();
+  setTimeout(()=>{highlighted=null;renderTree();},1500);
+}
+
+function bstSearch() {
+  const val = parseInt(document.getElementById('bstVal').value);
+  if (isNaN(val)) { log('Enter a value to search.'); return; }
+  function searchPath(r, v, path=[]) {
+    if (!r) return {found:false,path};
+    path.push(r.val);
+    if (v===r.val) return {found:true,path};
+    if (v<r.val) return searchPath(r.left,v,path);
+    return searchPath(r.right,v,path);
+  }
+  const {found,path} = searchPath(root,val);
+  if (found) log(`Found <strong>${val}</strong>! Path: ${path.join(' → ')}. Only ${path.length} comparisons!`, 'success-log');
+  else log(`Value ${val} not found. Searched path: ${path.join(' → ')} → NULL`);
+  highlighted = val; renderTree(); setTimeout(()=>{highlighted=null;renderTree();},2000);
+}
+
+function bstReset() { root=null; [50,30,70,20,40,60,80].forEach(v=>{root=insert(root,v);}); highlighted=null; renderTree(); log('Tree reset with default values.'); }
+bstReset();
+</script>
+</body></html>
