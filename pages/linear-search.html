@@ -1,10 +1,15 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
 <title>Linear Search — DSA Visualizer</title>
 <link rel="stylesheet" href="../css/style.css">
 <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+.code-line{display:block;padding:2px 10px;border-left:3px solid transparent;transition:background .2s,border-left-color .2s;border-radius:0 4px 4px 0;white-space:pre;font-family:'JetBrains Mono',monospace;font-size:0.77rem;line-height:1.75}
+.code-line.hl{background:rgba(59,130,246,.18);border-left-color:#3b82f6}
+.kw{color:#c792ea}.fn{color:#82aaff}.cm{color:#546e7a;font-style:italic}.nm{color:#f78c6c}.st{color:#c3e88d}.ty{color:#7dcfff}
+</style>
 </head>
 <body>
 <nav class="navbar"><div class="nav-brand"><span class="brand-icon">&lt;/&gt;</span><span class="brand-name">DSA Visualizer</span></div><div class="nav-links"><a href="../index.html#data-structures">Data Structures</a><a href="../index.html#algorithms">Algorithms</a></div></nav>
@@ -12,90 +17,103 @@
   <div class="viz-header">
     <a href="../index.html" class="back-link">← Back to Home</a>
     <h1>Linear Search</h1>
-    <p class="subtitle">Check each element one by one from the beginning until the target is found.</p>
-    <div class="complexity-badges"><span class="badge badge-yellow">Time O(n)</span><span class="badge badge-green">Space O(1)</span><span class="badge badge-green">Best O(1)</span></div>
+    <p class="subtitle">Check each element one by one until found or all checked.</p>
+    <div class="complexity-badges"><span class="badge badge-blue">Time O(n)</span><span class="badge badge-green">Space O(1)</span><span class="badge badge-green">Works on Unsorted</span></div>
   </div>
   <div class="viz-layout">
     <div>
       <div class="viz-panel">
-        <div class="panel-title">Visualization</div>
-        <div class="viz-canvas" style="flex-direction:column;gap:1.5rem">
-          <div class="array-viz" id="lsViz"></div>
+        <div class="panel-title">Linear Search — scan from left to right</div>
+        <div class="viz-canvas" style="flex-direction:column;gap:0.8rem">
+          <div class="array-viz" id="arrv"></div>
+          <div id="info" style="text-align:center;font-size:0.8rem;font-family:JetBrains Mono,monospace;color:var(--text-muted);min-height:18px"></div>
         </div>
         <div class="controls">
           <div class="control-row">
-            <input class="ctrl-input" id="lsTarget" type="number" placeholder="Search for...">
-            <button class="ctrl-btn" onclick="startSearch()">▶ Search</button>
-            <button class="ctrl-btn secondary" onclick="lsReset()">Reset</button>
+            <input class="ctrl-input" id="target" type="number" placeholder="Target value">
+            <button class="ctrl-btn" id="autoBtn" onclick="autoRun()">&#9654; Auto Search</button>
+            <button class="ctrl-btn" style="background:rgba(167,139,250,0.12);border-color:rgba(167,139,250,0.4);color:#c4b5fd" id="stepBtn" onclick="doStep()">Step &#8594;</button>
+            <button class="ctrl-btn secondary" onclick="rst()">Reset</button>
           </div>
-          <div class="speed-row"><span>Speed:</span><input type="range" id="lsSpeed" min="200" max="1200" value="600"><span>Fast</span></div>
+          <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:6px">
+            <span style="font-size:0.78rem;color:var(--text-muted)">Speed:</span>
+            <input type="range" id="spd" min="200" max="1200" value="700" style="width:100px">
+            <span style="font-size:0.78rem;color:var(--text-muted)">Fast</span>
+          </div>
         </div>
-        <div class="info-log" id="lsLog"><div class="log-entry">Enter a value and press Search to begin.</div></div>
+        <div class="info-log" id="log"><div class="log-entry">Enter a target value, then press Auto Search or Step.</div></div>
       </div>
-      <div class="explanation" style="margin-top:1rem">
-        <p><strong>Linear Search</strong> works on <strong>any array</strong> — sorted or unsorted. It scans from index 0 to the end, comparing each element with the target. Simple but slow for large datasets. Use <strong>Binary Search</strong> for sorted arrays to get O(log n) instead.</p>
-      </div>
+      <div class="explanation" style="margin-top:1rem"><p>The simplest search — no preprocessing needed, works on any array (sorted or not). Best case O(1) if the target is first; worst case O(n) if last or absent. Try: 42, 6, or 99.</p></div>
     </div>
     <div>
       <div class="viz-panel">
-        <div class="panel-title">Code</div>
-        <div class="code-panel"><pre><span class="kw">function</span> <span class="fn">linearSearch</span>(arr, target) {
-  <span class="kw">for</span> (<span class="kw">let</span> i = <span class="nm">0</span>; i &lt; arr.length; i++) {
-    <span class="cm">// Check each element</span>
-    <span class="kw">if</span> (arr[i] === target) {
-      <span class="kw">return</span> i; <span class="cm">// Found at i</span>
-    }
-  }
-  <span class="kw">return</span> <span class="nm">-1</span>; <span class="cm">// Not found</span>
-}
-<span class="cm">// Time:  O(n)
-// Space: O(1)
-// Best:  O(1) — found at index 0
-// Worst: O(n) — last element or not found</span></pre></div>
-        <div class="panel-title" style="margin-top:1rem">When to use</div>
-        <div class="stepper" style="padding:1rem">
-          <div class="step-item active-step"><div class="step-num">✓</div><div class="step-text">Array is small or unsorted</div></div>
-          <div class="step-item active-step"><div class="step-num">✓</div><div class="step-text">Works on any data type</div></div>
-          <div class="step-item"><div class="step-num">✗</div><div class="step-text">Avoid for large sorted arrays — use Binary Search</div></div>
-        </div>
+        <div class="panel-title">Pseudocode <small style="color:var(--text-muted);font-weight:400;font-size:0.7rem;margin-left:6px">— highlighted lines follow the animation</small></div>
+        <div class="code-panel" style="padding:0.4rem 0"><code>
+<span class="code-line" id="L1">FUNCTION linearSearch(arr, target):</span>
+<span class="code-line" id="L2">  FOR i FROM 0 TO length(arr) - 1:</span>
+<span class="code-line" id="L3">    // check current element</span>
+<span class="code-line" id="L4">    IF arr[i] = target THEN</span>
+<span class="code-line" id="L5">      RETURN i   // found at index i</span>
+<span class="code-line" id="L6">  END FOR</span>
+<span class="code-line" id="L7">  RETURN -1      // not found</span>
+<span class="code-line" id="L8">END FUNCTION</span>
+        </code></div>
       </div>
     </div>
   </div>
 </div>
 <script>
-let lsArr = [43,12,67,8,35,91,25,56];
-let currentIdx = -1, foundIdx = -1, searching = false;
 
-function render(compare=-1, found=-1) {
-  const viz = document.getElementById('lsViz');
-  viz.innerHTML = lsArr.map((v,i) => {
-    let cls = 'arr-cell';
-    if (i===found) cls += ' found';
-    else if (i===compare) cls += ' active';
-    else if (found===-1 && compare>-1 && i<compare) cls += ' compare';
-    return `<div class="${cls}" style="width:44px;height:44px">${v}<span class="idx">${i}</span></div>`;
+const sleep=ms=>new Promise(r=>setTimeout(r,ms));
+const spd=()=>1400-parseInt(document.getElementById('spd').value);
+function hl(...ids){document.querySelectorAll('.code-line').forEach(l=>l.classList.remove('hl'));ids.forEach(n=>{const e=document.getElementById('L'+n);if(e)e.classList.add('hl');});}
+function log(m,t=''){const e=document.getElementById('log');if(e)e.innerHTML=`<div class="log-entry ${t}">${m}</div>`+e.innerHTML;}
+
+const arr=[4,15,7,23,11,42,8,30,19,6];
+let i=0, searchTarget=null, done=false, found=-1, autoRunning=false;
+
+function render(){
+  document.getElementById('arrv').innerHTML=arr.map((v,k)=>{
+    let cls='arr-cell';
+    if(k===found)cls+=' found';
+    else if(k===i&&!done)cls+=' active';
+    else if(k<i&&found===-1)cls+=' compare';
+    return `<div class="${cls}" style="width:42px;height:42px">${v}<span class="idx">${k}</span></div>`;
   }).join('');
+  document.getElementById('info').textContent=searchTarget!==null
+    ?`Searching for: ${searchTarget}  |  Steps: ${Math.min(i,arr.length)}`
+    :'Enter a target and press Auto Search or Step.';
 }
 
-function log(msg,type='') { const el=document.getElementById('lsLog'); el.innerHTML=`<div class="log-entry ${type}">${msg}</div>`+el.innerHTML; }
-
-async function startSearch() {
-  if (searching) return;
-  const target = parseInt(document.getElementById('lsTarget').value);
-  if (isNaN(target)) { log('Enter a target value.'); return; }
-  searching=true; foundIdx=-1;
-  log(`Searching for <strong>${target}</strong>...`);
-  const speed = 1300 - parseInt(document.getElementById('lsSpeed').value);
-  for (let i=0; i<lsArr.length; i++) {
-    render(i,-1);
-    log(`Checking index ${i}: ${lsArr[i]} === ${target}? ${lsArr[i]===target?'✓ YES!':'✗ No'}`, lsArr[i]===target?'success-log':'');
-    await new Promise(r=>setTimeout(r,speed));
-    if (lsArr[i]===target) { render(i,i); log(`<strong>Found ${target} at index ${i}!</strong> Took ${i+1} comparison(s).`,'success-log'); searching=false; return; }
-  }
-  render(-1,-1); log(`<strong>${target} not found</strong>. Checked all ${lsArr.length} elements.`); searching=false;
+function doStep(){
+  if(done){log('Search complete. Enter a new target and press Auto Search.');return;}
+  // Read target fresh each call so it works both standalone and from autoRun
+  const t=parseInt(document.getElementById('target').value);
+  if(isNaN(t)){log('Enter a target value first.');return;}
+  searchTarget=t;
+  if(i>=arr.length){hl(6,7);done=true;log(`<strong>Not found.</strong> Checked all ${arr.length} elements.`);render();return;}
+  hl(2,3,4);log(`i=${i}: arr[${i}]=${arr[i]} == ${searchTarget}? ${arr[i]===searchTarget?'<span style="color:#34d399"><b>YES!</b></span>':'No'}`);
+  if(arr[i]===searchTarget){hl(4,5);found=i;done=true;log(`<strong>Found ${searchTarget} at index ${i}!</strong>`,'success-log');render();return;}
+  i++;render();
 }
 
-function lsReset() { searching=false; lsArr=[43,12,67,8,35,91,25,56]; render(); log('Array reset.'); }
+async function autoRun(){
+  const t=parseInt(document.getElementById('target').value);
+  if(isNaN(t)){log('Enter a target value first.');return;}
+  // Reset state fully before starting
+  i=0;done=false;found=-1;searchTarget=t;render();
+  if(autoRunning)return;
+  autoRunning=true;
+  document.getElementById('autoBtn').disabled=true;
+  document.getElementById('stepBtn').disabled=true;
+  log(`<strong>Auto searching for ${t}...</strong>`,'highlight');
+  while(!done&&autoRunning){doStep();await sleep(spd());}
+  document.getElementById('autoBtn').disabled=false;
+  document.getElementById('stepBtn').disabled=false;
+  autoRunning=false;
+}
+
+function rst(){i=0;done=false;found=-1;searchTarget=null;autoRunning=false;render();log('Reset.');hl();}
 render();
 </script>
 </body></html>

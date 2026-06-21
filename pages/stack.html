@@ -1,125 +1,140 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
 <title>Stack — DSA Visualizer</title>
 <link rel="stylesheet" href="../css/style.css">
 <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+.code-line{display:block;padding:2px 10px;border-left:3px solid transparent;transition:background .2s,border-left-color .2s;border-radius:0 4px 4px 0;white-space:pre;font-family:'JetBrains Mono',monospace;font-size:0.77rem;line-height:1.75}
+.code-line.hl{background:rgba(59,130,246,.18);border-left-color:#3b82f6}
+.code-line.hl2{background:rgba(16,185,129,.15);border-left-color:#10b981}
+.kw{color:#c792ea}.fn{color:#82aaff}.cm{color:#546e7a;font-style:italic}.nm{color:#f78c6c}.st{color:#c3e88d}.ty{color:#7dcfff}.op{color:#89ddff}
+.step-controls{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:6px}
+.btn-step{background:rgba(167,139,250,0.12);border:1px solid rgba(167,139,250,0.4);color:#c4b5fd;padding:6px 14px;border-radius:6px;cursor:pointer;font-family:inherit;font-size:0.82rem;transition:all .15s}
+.btn-step:hover{background:rgba(167,139,250,0.22);border-color:#a78bfa}
+.btn-step:disabled{opacity:0.35;cursor:not-allowed}
+</style>
 </head>
 <body>
-<nav class="navbar"><div class="nav-brand"><span class="brand-icon">&lt;/&gt;</span><span class="brand-name">DSA Visualizer</span></div><div class="nav-links"><a href="../index.html#data-structures">Data Structures</a><a href="../index.html#algorithms">Algorithms</a></div></nav>
+<nav class="navbar">
+  <div class="nav-brand"><span class="brand-icon">&lt;/&gt;</span><span class="brand-name">DSA Visualizer</span></div>
+  <div class="nav-links"><a href="../index.html#data-structures">Data Structures</a><a href="../index.html#algorithms">Algorithms</a></div>
+</nav>
 <div class="viz-page">
   <div class="viz-header">
     <a href="../index.html" class="back-link">← Back to Home</a>
     <h1>Stack</h1>
-    <p class="subtitle">A Last In, First Out (LIFO) data structure — like a stack of plates.</p>
+    <p class="subtitle">Last In, First Out — push to top, pop from top.</p>
     <div class="complexity-badges"><span class="badge badge-green">Push O(1)</span><span class="badge badge-green">Pop O(1)</span><span class="badge badge-green">Peek O(1)</span></div>
   </div>
   <div class="viz-layout">
     <div>
       <div class="viz-panel">
-        <div class="panel-title">Visualization — Stack grows upward</div>
-        <div class="viz-canvas" style="flex-direction:column;align-items:center;gap:0.5rem">
-          <div style="font-size:0.75rem;color:var(--text-muted);font-family:var(--font-mono)">← TOP (last in, first out)</div>
-          <div class="stack-viz" id="stackViz" style="padding:0.5rem 0"></div>
-          <div style="width:148px;height:3px;background:var(--border);border-radius:2px"></div>
-          <div style="font-size:0.72rem;color:var(--text-muted)">Bottom of Stack</div>
-        </div>
+        <div class="panel-title">Stack — Last In First Out (LIFO)</div>
+<div class="viz-canvas">
+  <div id="stackViz" style="display:flex;flex-direction:column-reverse;gap:4px;min-height:200px;justify-content:flex-start;align-items:center;padding:1rem"></div>
+</div>
         <div class="controls">
           <div class="control-row">
-            <input class="ctrl-input" id="stackVal" type="number" placeholder="Value" min="0" max="99">
-            <button class="ctrl-btn" onclick="stackPush()">Push</button>
-            <button class="ctrl-btn danger" onclick="stackPop()">Pop</button>
-            <button class="ctrl-btn secondary" onclick="stackPeek()">Peek</button>
-          </div>
-          <div class="control-row"><button class="ctrl-btn secondary" onclick="stackReset()">Reset</button></div>
+  <input class="ctrl-input" id="val" type="number" placeholder="Value">
+  <button class="ctrl-btn" onclick="push()">Push</button>
+  <button class="ctrl-btn danger" onclick="pop()">Pop</button>
+  <button class="ctrl-btn secondary" onclick="peek()">Peek</button>
+  <button class="ctrl-btn secondary" onclick="rst()">Reset</button>
+</div>
+<div class="step-controls">
+  <span style="font-size:0.78rem;color:var(--text-muted)">Speed:</span>
+  <input type="range" id="spd" min="200" max="1200" value="600" style="width:100px">
+  <span style="font-size:0.78rem;color:var(--text-muted)">Fast</span>
+</div>
         </div>
-        <div class="info-log" id="stackLog"><div class="log-entry">Stack has 3 elements. TOP is 30.</div></div>
+        <div class="info-log" id="log"><div class="log-entry">Ready — use Step to go one step at a time, or Auto to run fully.</div></div>
       </div>
-      <div class="explanation" style="margin-top:1rem">
-        <p><strong>Real-world uses:</strong> Browser back button (each page is pushed; back pops), undo operations in editors, function call stack in programming, and expression evaluation.</p>
-      </div>
+      <div class="explanation" style="margin-top:1rem"><p>Think of a stack of plates — you always add and remove from the top. Used for undo systems, function call stacks, expression evaluation, and depth-first search.</p></div>
     </div>
     <div>
-      <div class="viz-panel">
-        <div class="panel-title">Code</div>
-        <div class="code-panel"><pre><span class="kw">class</span> <span class="fn">Stack</span> {
-  <span class="fn">constructor</span>() {
-    <span class="kw">this</span>.items = [];
-  }
-
-  <span class="fn">push</span>(val) {
-    <span class="kw">this</span>.items.<span class="fn">push</span>(val);
-    <span class="cm">// O(1)</span>
-  }
-
-  <span class="fn">pop</span>() {
-    <span class="kw">if</span> (<span class="kw">this</span>.<span class="fn">isEmpty</span>()) <span class="kw">return</span> <span class="nm">null</span>;
-    <span class="kw">return this</span>.items.<span class="fn">pop</span>();
-    <span class="cm">// O(1)</span>
-  }
-
-  <span class="fn">peek</span>() {
-    <span class="kw">return this</span>.items[
-      <span class="kw">this</span>.items.length - <span class="nm">1</span>
-    ]; <span class="cm">// O(1)</span>
-  }
-
-  <span class="fn">isEmpty</span>() {
-    <span class="kw">return this</span>.items.length === <span class="nm">0</span>;
-  }
-}</pre></div>
-        <div class="panel-title" style="margin-top:1rem">Key Concept</div>
-        <div class="stepper" style="padding:1rem">
-          <div class="step-item active-step"><div class="step-num">↑</div><div class="step-text"><strong>Push:</strong> Add to the TOP of the stack</div></div>
-          <div class="step-item"><div class="step-num">↓</div><div class="step-text"><strong>Pop:</strong> Remove from the TOP only</div></div>
-          <div class="step-item"><div class="step-num">👁</div><div class="step-text"><strong>Peek:</strong> See the TOP without removing it</div></div>
-        </div>
+      <div class="viz-panel"><div class="panel-title">Pseudocode <small style="color:var(--text-muted);font-weight:400;font-size:0.7rem;margin-left:6px">— highlighted lines follow the animation</small></div>
+        <div class="code-panel" style="padding:0.4rem 0;overflow-x:auto"><code>
+<span class="code-line" id="L1">STACK: arr[], top = -1</span>
+<span class="code-line" id="L2"></span>
+<span class="code-line" id="L3">PROCEDURE push(val):</span>
+<span class="code-line" id="L4">  top ← top + 1</span>
+<span class="code-line" id="L5">  arr[top] ← val</span>
+<span class="code-line" id="L6">END PROCEDURE</span>
+<span class="code-line" id="L7"></span>
+<span class="code-line" id="L8">FUNCTION pop():</span>
+<span class="code-line" id="L9">  IF top = -1 THEN raise error</span>
+<span class="code-line" id="L10">  val ← arr[top]</span>
+<span class="code-line" id="L11">  top ← top - 1</span>
+<span class="code-line" id="L12">  RETURN val</span>
+<span class="code-line" id="L13">END FUNCTION</span>
+<span class="code-line" id="L14"></span>
+<span class="code-line" id="L15">FUNCTION peek():</span>
+<span class="code-line" id="L16">  IF top = -1 THEN raise error</span>
+<span class="code-line" id="L17">  RETURN arr[top]</span>
+<span class="code-line" id="L18">END FUNCTION</span>
+<span class="code-line" id="L19"></span>
+<span class="code-line" id="L20">FUNCTION isEmpty():</span>
+<span class="code-line" id="L21">  RETURN top = -1</span>
+<span class="code-line" id="L22">END FUNCTION</span>
+        </code></div>
       </div>
     </div>
   </div>
 </div>
 <script>
-let stack = [10, 20, 30];
 
-function render() {
-  const viz = document.getElementById('stackViz');
-  if (stack.length === 0) { viz.innerHTML = '<div style="color:var(--text-muted);font-size:0.85rem">Stack is empty</div>'; return; }
-  viz.innerHTML = [...stack].reverse().map((v, i) => `
-    <div class="stack-cell ${i===0?'top':''}">
-      <span>${v}</span>
-      <span class="stack-label">${i===0?'TOP':''}</span>
-    </div>`).join('');
+const sleep = ms => new Promise(r => setTimeout(r, ms));
+const spd = () => 1400 - parseInt(document.getElementById('spd')?.value ?? 700);
+function hl(...ids) {
+  document.querySelectorAll('.code-line').forEach(l => l.classList.remove('hl','hl2'));
+  ids.forEach(n => { const e = document.getElementById('L'+n); if(e) e.classList.add('hl'); });
+}
+function hl2(...ids) { ids.forEach(n => { const e = document.getElementById('L'+n); if(e) e.classList.add('hl2'); }); }
+function log(m, t='') {
+  const e = document.getElementById('log');
+  if(e) e.innerHTML = `<div class="log-entry ${t}">${m}</div>` + e.innerHTML;
 }
 
-function log(msg, type='') {
-  const el = document.getElementById('stackLog');
-  el.innerHTML = `<div class="log-entry ${type}">${msg}</div>` + el.innerHTML;
-}
 
-function stackPush() {
-  const val = parseInt(document.getElementById('stackVal').value);
-  if (isNaN(val)) { log('Enter a value to push.'); return; }
-  if (stack.length >= 6) { log('Stack is full (max 6 elements shown).'); return; }
-  stack.push(val);
-  log(`Pushed <strong>${val}</strong> onto the stack. New TOP = ${val}`, 'highlight');
-  render();
+let stack = []; let topHL = false;
+function render(hiTop=false) {
+  const d = document.getElementById('stackViz');
+  if (!stack.length) { d.innerHTML='<div style="color:#4a5568;font-size:0.85rem;font-family:Inter">Empty stack</div>'; return; }
+  d.innerHTML = stack.map((v,i) => {
+    const isTop = i === stack.length-1;
+    const bg = isTop && hiTop ? 'rgba(59,130,246,0.25)' : isTop ? 'rgba(255,255,255,0.06)' : '#111827';
+    const border = isTop && hiTop ? '#3b82f6' : isTop ? 'rgba(255,255,255,0.25)' : 'rgba(255,255,255,0.08)';
+    return `<div style="width:140px;padding:10px 20px;background:${bg};border:2px solid ${border};border-radius:8px;font-family:JetBrains Mono,monospace;font-size:0.9rem;color:#f0f4ff;text-align:center;position:relative">
+      ${v}${isTop?'<span style="position:absolute;right:8px;top:50%;transform:translateY(-50%);font-size:0.65rem;color:#60a5fa;font-family:Inter">← TOP</span>':''}
+    </div>`;
+  }).join('');
 }
-
-function stackPop() {
-  if (stack.length === 0) { log('Stack underflow! Cannot pop from empty stack.'); return; }
-  const val = stack.pop();
-  log(`Popped <strong>${val}</strong> from the stack. New TOP = ${stack.length > 0 ? stack[stack.length-1] : 'empty'}`, 'highlight');
-  render();
+async function push() {
+  const v = parseInt(document.getElementById('val').value);
+  if (isNaN(v)) { log('Enter a value.'); return; }
+  if (stack.length >= 8) { log('Stack full (max 8 for display).'); return; }
+  hl(5); log(`push(${v}): increment top, place value`, 'highlight'); await sleep(spd());
+  hl(6); stack.push(v); render(true); await sleep(spd());
+  render(false); log(`Pushed <strong>${v}</strong>. top = ${stack.length-1}.`, 'highlight');
 }
-
-function stackPeek() {
-  if (stack.length === 0) { log('Stack is empty.'); return; }
-  log(`Peek → TOP is <strong>${stack[stack.length-1]}</strong>. Stack unchanged.`, 'success-log');
-  render();
+async function pop() {
+  hl(9,10); await sleep(spd());
+  if (!stack.length) { log('Stack is empty — cannot pop!'); return; }
+  render(true); await sleep(spd());
+  hl(11); const v = stack.pop(); render(false);
+  log(`Popped <strong>${v}</strong>. top = ${stack.length-1}.`, 'highlight');
 }
+async function peek() {
+  hl(14,15); await sleep(spd());
+  if (!stack.length) { log('Stack is empty!'); return; }
+  render(true); hl(16);
+  log(`Peek = <strong>${stack[stack.length-1]}</strong> (top, not removed).`, 'success-log');
+  await sleep(spd()*1.5); render(false);
+}
+function rst() { stack=[10,20,30]; render(); log('Stack reset.'); hl(); }
+rst();
 
-function stackReset() { stack = [10, 20, 30]; render(); log('Stack reset.'); }
-render();
 </script>
 </body></html>

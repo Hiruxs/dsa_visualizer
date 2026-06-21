@@ -1,195 +1,159 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
 <title>Merge Sort — DSA Visualizer</title>
 <link rel="stylesheet" href="../css/style.css">
 <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+.code-line{display:block;padding:2px 10px;border-left:3px solid transparent;transition:background .2s,border-left-color .2s;border-radius:0 4px 4px 0;white-space:pre;font-family:'JetBrains Mono',monospace;font-size:0.77rem;line-height:1.75}
+.code-line.hl{background:rgba(59,130,246,.18);border-left-color:#3b82f6}
+.code-line.hl2{background:rgba(16,185,129,.15);border-left-color:#10b981}
+.kw{color:#c792ea}.fn{color:#82aaff}.cm{color:#546e7a;font-style:italic}.nm{color:#f78c6c}.st{color:#c3e88d}.ty{color:#7dcfff}.op{color:#89ddff}
+.step-controls{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:6px}
+.btn-step{background:rgba(167,139,250,0.12);border:1px solid rgba(167,139,250,0.4);color:#c4b5fd;padding:6px 14px;border-radius:6px;cursor:pointer;font-family:inherit;font-size:0.82rem;transition:all .15s}
+.btn-step:hover{background:rgba(167,139,250,0.22);border-color:#a78bfa}
+.btn-step:disabled{opacity:0.35;cursor:not-allowed}
+</style>
 </head>
 <body>
-<nav class="navbar"><div class="nav-brand"><span class="brand-icon">&lt;/&gt;</span><span class="brand-name">DSA Visualizer</span></div><div class="nav-links"><a href="../index.html#data-structures">Data Structures</a><a href="../index.html#algorithms">Algorithms</a></div></nav>
+<nav class="navbar">
+  <div class="nav-brand"><span class="brand-icon">&lt;/&gt;</span><span class="brand-name">DSA Visualizer</span></div>
+  <div class="nav-links"><a href="../index.html#data-structures">Data Structures</a><a href="../index.html#algorithms">Algorithms</a></div>
+</nav>
 <div class="viz-page">
   <div class="viz-header">
     <a href="../index.html" class="back-link">← Back to Home</a>
     <h1>Merge Sort</h1>
-    <p class="subtitle">Divide the array in half recursively, sort each half, then merge them back together.</p>
-    <div class="complexity-badges"><span class="badge badge-blue">Time O(n log n)</span><span class="badge badge-green">Space O(n)</span></div>
+    <p class="subtitle">Divide in half recursively, then merge sorted halves together.</p>
+    <div class="complexity-badges"><span class="badge badge-green">Time O(n log n)</span><span class="badge badge-yellow">Space O(n)</span><span class="badge badge-green">Stable</span></div>
   </div>
   <div class="viz-layout">
     <div>
       <div class="viz-panel">
-        <div class="panel-title">Visualization</div>
-        <div class="viz-canvas"><svg id="pageSvg" width="420" height="230" viewBox="0 0 420 230"></svg></div>
-        <div class="info-log" id="pageLog"><div class="log-entry">Visualization for Merge Sort.</div></div>
+        <div class="panel-title">Merge Sort — divide then merge sorted halves</div>
+<div class="viz-canvas" style="flex-direction:column;gap:0.8rem">
+  <div class="bar-viz" id="bars"></div>
+  <div class="array-viz" id="arrv"></div>
+  <div id="info" style="text-align:center;font-size:0.78rem;font-family:JetBrains Mono,monospace;color:var(--text-muted);min-height:18px"></div>
+</div>
+        <div class="controls">
+          <div class="control-row">
+  <button class="ctrl-btn" id="autoBtn" onclick="autoRun()">▶ Auto Sort</button>
+  <button class="ctrl-btn btn-step" id="stepBtn" onclick="doStep()">Step →</button>
+  <button class="ctrl-btn secondary" onclick="shuffle()">Shuffle</button>
+  <button class="ctrl-btn secondary" onclick="rst()">Reset</button>
+</div>
+<div class="step-controls">
+  <span style="font-size:0.78rem;color:var(--text-muted)">Speed:</span>
+  <input type="range" id="spd" min="200" max="1200" value="600" style="width:100px">
+  <span style="font-size:0.78rem;color:var(--text-muted)">Fast</span>
+</div>
+        </div>
+        <div class="info-log" id="log"><div class="log-entry">Ready — use Step to go one step at a time, or Auto to run fully.</div></div>
       </div>
-      <div class="explanation" style="margin-top:1rem"><p id="pageExp"></p></div>
+      <div class="explanation" style="margin-top:1rem"><p><strong>Divide:</strong> Split at midpoint until 1-element arrays (trivially sorted). <strong>Merge:</strong> Combine two sorted halves by picking the smaller front element each time. Guaranteed O(n log n) on all inputs — unlike Quick Sort which can degrade to O(n²).</p></div>
     </div>
-    <div><div class="viz-panel"><div class="panel-title">Key Points</div><div class="stepper" style="padding:1rem" id="keyPts"></div></div></div>
+    <div>
+      <div class="viz-panel">
+        <div class="panel-title">Pseudocode <small style="color:var(--text-muted);font-weight:400;font-size:0.7rem;margin-left:6px">— highlighted lines follow the animation</small></div>
+        <div class="code-panel" style="padding:0.4rem 0;overflow-x:auto"><code>
+<span class="code-line" id="L1">MERGESORT(A, p, r)</span>
+<span class="code-line" id="L2">1  if p < r</span>
+<span class="code-line" id="L3">2      q = (p + r) / 2</span>
+<span class="code-line" id="L4">3      MERGESORT(A, p, q)</span>
+<span class="code-line" id="L5">4      MERGESORT(A, q+1, r)</span>
+<span class="code-line" id="L6">5      MERGE(A, p, q, r)</span>
+<span class="code-line" id="L7"></span>
+<span class="code-line" id="L8">MERGE(A, p, q, r)</span>
+<span class="code-line" id="L9">1  n1 = q - p + 1</span>
+<span class="code-line" id="L10">2  n2 = r - q</span>
+<span class="code-line" id="L11">3  create arrays L[1..n1] and R[1..n2]</span>
+<span class="code-line" id="L12">4  for i = 1 to n1</span>
+<span class="code-line" id="L13">5      L[i] = A[p + i - 1]</span>
+<span class="code-line" id="L14">6  for j = 1 to n2</span>
+<span class="code-line" id="L15">7      R[j] = A[q + j]</span>
+<span class="code-line" id="L16">8  i = 1,  j = 1,  k = p</span>
+<span class="code-line" id="L17">9  while i <= n1 and j <= n2</span>
+<span class="code-line" id="L18">10     if L[i] <= R[j]</span>
+<span class="code-line" id="L19">11         A[k] = L[i];  i = i + 1   // pick left</span>
+<span class="code-line" id="L20">12     else</span>
+<span class="code-line" id="L21">13         A[k] = R[j];  j = j + 1   // pick right</span>
+<span class="code-line" id="L22">14     k = k + 1</span>
+<span class="code-line" id="L23">15 copy remaining L or R into A</span>
+        </code></div>
+      </div>
+    </div>
   </div>
 </div>
 <script>
-const SLUG = 'merge-sort';
 
-const sampleTree = {val:8,left:{val:3,left:{val:1,left:null,right:null},right:{val:6,left:null,right:null}},right:{val:10,left:null,right:{val:14,left:{val:13,left:null,right:null},right:null}}};
-const maxHeapTree = {val:16,left:{val:14,left:{val:8,left:null,right:null},right:{val:7,left:null,right:null}},right:{val:10,left:{val:9,left:null,right:null},right:{val:3,left:null,right:null}}};
-const minHeapTree = {val:1,left:{val:3,left:{val:8,left:null,right:null},right:{val:7,left:null,right:null}},right:{val:6,left:{val:9,left:null,right:null},right:{val:10,left:null,right:null}}};
-
-function drawNodes(svg, nodeArr, edgeArr, highlighted=[], sorted=[]) {
-  svg.innerHTML = edgeArr.map(e=>`<line x1="${e.x1}" y1="${e.y1}" x2="${e.x2}" y2="${e.y2}" stroke="rgba(255,255,255,0.1)" stroke-width="2"/>`).join('') +
-    nodeArr.map(n=>`<circle cx="${n.x}" cy="${n.y}" r="22" fill="${highlighted.includes(n.v)?'rgba(59,130,246,0.2)':sorted.includes(n.v)?'rgba(16,185,129,0.2)':'#111827'}" stroke="${highlighted.includes(n.v)?'#3b82f6':sorted.includes(n.v)?'#10b981':'rgba(255,255,255,0.12)'}" stroke-width="2"/><text x="${n.x}" y="${n.y}" text-anchor="middle" dominant-baseline="central" font-family="JetBrains Mono,monospace" font-size="13" fill="${highlighted.includes(n.v)?'#60a5fa':sorted.includes(n.v)?'#34d399':'#f0f4ff'}">${n.v}</text>`).join('');
+const sleep = ms => new Promise(r => setTimeout(r, ms));
+const spd = () => 1400 - parseInt(document.getElementById('spd')?.value ?? 700);
+function hl(...ids) {
+  document.querySelectorAll('.code-line').forEach(l => l.classList.remove('hl','hl2'));
+  ids.forEach(n => { const e = document.getElementById('L'+n); if(e) e.classList.add('hl'); });
 }
-function treePos(node, x, y, gap, nodes=[], edges=[]) {
-  if (!node) return {nodes, edges};
-  nodes.push({v:node.val, x, y});
-  if (node.left) { edges.push({x1:x,y1:y,x2:x-gap,y2:y+55}); treePos(node.left, x-gap, y+55, gap/2, nodes, edges); }
-  if (node.right) { edges.push({x1:x,y1:y,x2:x+gap,y2:y+55}); treePos(node.right, x+gap, y+55, gap/2, nodes, edges); }
-  return {nodes, edges};
-}
-function drawTree(svg, tree, hl=[], sorted=[]) {
-  const {nodes, edges} = treePos(tree, 210, 30, 100);
-  drawNodes(svg, nodes, edges, hl, sorted);
+function hl2(...ids) { ids.forEach(n => { const e = document.getElementById('L'+n); if(e) e.classList.add('hl2'); }); }
+function log(m, t='') {
+  const e = document.getElementById('log');
+  if(e) e.innerHTML = `<div class="log-entry ${t}">${m}</div>` + e.innerHTML;
 }
 
-const dsaConfigs = {
-  'circular-queue':{
-    explanation:'<strong>Circular Queue</strong> solves the wasted-space problem of a regular queue. When the rear reaches the end, it wraps around to the front using modular arithmetic: <strong>(index + 1) % size</strong>. The queue is full when <strong>(rear + 1) % size === front</strong>.',
-    points:['Wraps around using modulo arithmetic','Reuses freed-up front slots efficiently','Full when (rear+1)%size === front','Empty when front === rear'],
-    draw(svg){
-      const cx=210,cy=115,r=80; const items=[15,32,8,47,null,null,23,61];
-      svg.innerHTML='';
-      items.forEach((v,i)=>{
-        const a=(i/8)*2*Math.PI-Math.PI/2, x=cx+r*Math.cos(a), y=cy+r*Math.sin(a);
-        const isFront=i===2, isRear=i===6, isEmpty=v===null;
-        svg.innerHTML+=`<circle cx="${x}" cy="${y}" r="24" fill="${isFront?'rgba(59,130,246,0.2)':isRear?'rgba(16,185,129,0.2)':isEmpty?'rgba(255,255,255,0.02)':'#111827'}" stroke="${isFront?'#3b82f6':isRear?'#10b981':isEmpty?'rgba(255,255,255,0.06)':'rgba(255,255,255,0.1)'}" stroke-width="2"/>
-          <text x="${x}" y="${y}" text-anchor="middle" dominant-baseline="central" font-family="JetBrains Mono,monospace" font-size="${isEmpty?'10':'13'}" fill="${isEmpty?'#4a5568':'#f0f4ff'}">${isEmpty?'empty':v}</text>`;
-      });
-      svg.innerHTML+=`<text x="${cx}" y="${cy-8}" text-anchor="middle" font-size="11" fill="#3b82f6" font-family="Inter,sans-serif">FRONT=2</text><text x="${cx}" y="${cy+12}" text-anchor="middle" font-size="11" fill="#10b981" font-family="Inter,sans-serif">REAR=6</text>`;
-    }
-  },
-  'binary-tree':{
-    explanation:'<strong>Binary Tree</strong> is the foundation of many data structures. Each node has a value and up to two children. There is <strong>no ordering rule</strong> (unlike BST). Used in expression trees, Huffman encoding, and as the basis for heaps.',
-    points:['Each node has at most 2 children','No ordering constraint (unlike BST)','Root is the topmost node','Leaf nodes have no children'],
-    draw(svg){drawTree(svg,sampleTree);}
-  },
-  'complete-binary-tree':{
-    explanation:'<strong>Complete Binary Tree:</strong> All levels are completely filled except possibly the last, filled from <strong>left to right</strong>. This allows efficient array representation — node at index i has children at 2i+1 and 2i+2.',
-    points:['All levels filled left to right','Stored efficiently as an array','Heaps are always complete binary trees','Height is always O(log n)'],
-    draw(svg){drawTree(svg,{val:1,left:{val:2,left:{val:4,left:null,right:null},right:{val:5,left:null,right:null}},right:{val:3,left:{val:6,left:null,right:null},right:null}});}
-  },
-  'full-binary-tree':{
-    explanation:'<strong>Full Binary Tree:</strong> Every internal node has exactly <strong>2 children</strong>. Leaf nodes have 0 children. If a full binary tree has L leaves, it has exactly L-1 internal nodes. Used in expression trees.',
-    points:['Every node has 0 or 2 children','Never exactly 1 child','L leaves means L-1 internal nodes','Used in expression trees and Huffman coding'],
-    draw(svg){drawTree(svg,{val:1,left:{val:2,left:{val:4,left:null,right:null},right:{val:5,left:null,right:null}},right:{val:3,left:{val:6,left:null,right:null},right:{val:7,left:null,right:null}}});}
-  },
-  'heap':{
-    explanation:'<strong>Heap</strong> is a complete binary tree satisfying the heap property. In a <strong>max heap</strong>, every parent >= its children. In a <strong>min heap</strong>, every parent <= its children. Stored as an array — no pointers needed.',
-    points:['Always a complete binary tree','Root holds max or min element','Stored as array — index math gives children','Used in priority queues and heap sort'],
-    draw(svg){drawTree(svg,maxHeapTree);}
-  },
-  'max-heap':{
-    explanation:'<strong>Max Heap:</strong> The parent is always <strong>greater than or equal to</strong> its children. The <strong>root is always the maximum</strong>. After inserting, bubble up. After extracting root, replace with last element and sift down.',
-    points:['Root = maximum element always','Parent >= both children at every level','Insert: add at end, bubble up O(log n)','Extract max: swap root with last, sift down O(log n)'],
-    draw(svg){drawTree(svg,maxHeapTree,[16],[]);}
-  },
-  'min-heap':{
-    explanation:'<strong>Min Heap:</strong> The parent is always <strong>less than or equal to</strong> its children. The <strong>root is always the minimum</strong>. Used in Dijkstra shortest path, Prim MST, and scheduling algorithms.',
-    points:['Root = minimum element always','Parent <= both children at every level','Useful for priority queues (min)','Dijkstras algorithm uses a min heap'],
-    draw(svg){drawTree(svg,minHeapTree,[1],[]);}
-  },
-  'merge-sort':{
-    explanation:'<strong>Merge Sort</strong> uses divide and conquer. Split the array in half recursively until single elements remain. Then merge pairs back in sorted order. Guaranteed <strong>O(n log n)</strong> even worst case, but requires O(n) extra space.',
-    points:['Always O(n log n) — very reliable','Stable sort — equal elements keep their order','Requires O(n) extra space','Best for linked lists and external sorting'],
-    draw(svg){
-      svg.innerHTML='';
-      const arr=[38,27,43,3,9,82,10];
-      arr.forEach((v,i)=>{
-        const x=30+i*55;
-        svg.innerHTML+=`<rect x="${x-20}" y="15" width="40" height="28" rx="4" fill="#111827" stroke="rgba(255,255,255,0.1)" stroke-width="1.5"/><text x="${x}" y="29" text-anchor="middle" dominant-baseline="central" font-size="12" font-family="JetBrains Mono,monospace" fill="#f0f4ff">${v}</text>`;
-      });
-      [[38,27,43],[3,9,82,10]].forEach((h,hi)=>{
-        h.forEach((v,i)=>{ const x=(hi===0?30:195)+i*55; svg.innerHTML+=`<rect x="${x-20}" y="75" width="40" height="28" rx="4" fill="#111827" stroke="rgba(59,130,246,0.3)" stroke-width="1.5"/><text x="${x}" y="89" text-anchor="middle" dominant-baseline="central" font-size="12" font-family="JetBrains Mono,monospace" fill="#60a5fa">${v}</text>`; });
-      });
-      [3,9,10,27,38,43,82].forEach((v,i)=>{ const x=30+i*55; svg.innerHTML+=`<rect x="${x-20}" y="135" width="40" height="28" rx="4" fill="rgba(16,185,129,0.1)" stroke="#10b981" stroke-width="1.5"/><text x="${x}" y="149" text-anchor="middle" dominant-baseline="central" font-size="12" font-family="JetBrains Mono,monospace" fill="#34d399">${v}</text>`; });
-      svg.innerHTML+=`<text x="210" y="195" text-anchor="middle" font-size="11" fill="#4a5568" font-family="Inter,sans-serif">Original → Split → Merged sorted</text>`;
-    }
-  },
-  'heap-sort':{
-    explanation:'<strong>Heap Sort:</strong> Phase 1 — Build a max heap from the array in O(n). Phase 2 — Repeatedly extract the maximum (swap root with last, reduce heap size, heapify) n times. Result: sorted array in-place with O(1) extra space.',
-    points:['Phase 1: Build max heap O(n)','Phase 2: Extract max n times O(n log n)','In-place — no extra memory needed','Not a stable sort'],
-    draw(svg){drawTree(svg,maxHeapTree);}
-  },
-  'inorder':{
-    explanation:'<strong>Inorder Traversal (Left → Root → Right):</strong> For a BST, this produces elements in <strong>sorted ascending order</strong>. Uses recursion (implicit call stack). Each node is visited exactly once, giving O(n) time.',
-    points:['Order: Left → Root → Right','BST inorder gives sorted output','Used for BST validation','Works recursively or iteratively with a stack'],
-    draw(svg){
-      const {nodes,edges}=treePos(sampleTree,210,30,100);
-      drawNodes(svg,nodes,edges,[8],[1,3,6,10,13,14]);
-      svg.innerHTML+=`<text x="210" y="215" text-anchor="middle" font-size="11" fill="#60a5fa" font-family="JetBrains Mono,monospace">1 → 3 → 6 → 8 → 10 → 13 → 14</text>`;
-    }
-  },
-  'preorder':{
-    explanation:'<strong>Preorder Traversal (Root → Left → Right):</strong> Visit the root first, then traverse left, then right. Used to <strong>copy or serialize</strong> a tree — you get the root before its children, so you can reconstruct it.',
-    points:['Order: Root → Left → Right','Root always comes first in output','Used for copying and serializing trees','Useful for prefix expression notation'],
-    draw(svg){
-      const {nodes,edges}=treePos(sampleTree,210,30,100);
-      drawNodes(svg,nodes,edges,[8],[]);
-      svg.innerHTML+=`<text x="210" y="215" text-anchor="middle" font-size="11" fill="#60a5fa" font-family="JetBrains Mono,monospace">8 → 3 → 1 → 6 → 10 → 14 → 13</text>`;
-    }
-  },
-  'postorder':{
-    explanation:'<strong>Postorder Traversal (Left → Right → Root):</strong> Visit children before the parent. Used to <strong>safely delete</strong> a tree (always delete children before parent) and in postfix expression evaluation.',
-    points:['Order: Left → Right → Root','Root always comes last in output','Used for safe deletion of tree nodes','Postfix expression evaluation'],
-    draw(svg){
-      const {nodes,edges}=treePos(sampleTree,210,30,100);
-      drawNodes(svg,nodes,edges,[],[8]);
-      svg.innerHTML+=`<text x="210" y="215" text-anchor="middle" font-size="11" fill="#34d399" font-family="JetBrains Mono,monospace">1 → 6 → 3 → 13 → 14 → 10 → 8</text>`;
-    }
-  },
-  'recursion':{
-    explanation:'<strong>Recursion</strong> is a function calling itself with a <strong>smaller version of the problem</strong>. Every recursive function needs: (1) a <strong>base case</strong> that stops recursion, and (2) a <strong>recursive case</strong> that makes progress toward the base case.',
-    points:['Must have a base case to avoid infinite loops','Each call reduces the problem size','Uses the call stack implicitly','Can always be converted to iteration'],
-    draw(svg){
-      svg.innerHTML='';
-      const calls=['factorial(5) = 5 * ...','factorial(4) = 4 * ...','factorial(3) = 3 * ...','factorial(2) = 2 * ...','factorial(1) = 1 ← base'];
-      calls.forEach((c,i)=>{
-        const isBase=i===4;
-        svg.innerHTML+=`<rect x="110" y="${15+i*42}" width="200" height="30" rx="4" fill="${isBase?'rgba(16,185,129,0.1)':'#111827'}" stroke="${isBase?'#10b981':'rgba(59,130,246,0.3)'}" stroke-width="1.5"/><text x="210" y="${30+i*42}" text-anchor="middle" dominant-baseline="central" font-size="11" font-family="JetBrains Mono,monospace" fill="${isBase?'#34d399':'#f0f4ff'}">${c}</text>`;
-        if(i<4) svg.innerHTML+=`<line x1="210" y1="${45+i*42}" x2="210" y2="${57+i*42}" stroke="rgba(59,130,246,0.4)" stroke-width="1.5" stroke-dasharray="4"/>`;
-      });
-    }
-  },
-  'divide-conquer':{
-    explanation:'<strong>Divide and Conquer:</strong> Break the problem into smaller independent subproblems, solve each recursively, then combine. Famous examples: Merge Sort, Quick Sort, Binary Search, and Strassen matrix multiplication.',
-    points:['Divide: split problem into subproblems','Conquer: solve each part recursively','Combine: merge solutions together','Often achieves O(n log n) or O(log n) complexity'],
-    draw(svg){
-      svg.innerHTML=`<rect x="155" y="10" width="100" height="28" rx="4" fill="#111827" stroke="rgba(59,130,246,0.4)" stroke-width="2"/><text x="205" y="24" text-anchor="middle" dominant-baseline="central" font-size="11" font-family="JetBrains Mono,monospace" fill="#f0f4ff">Problem</text>
-        <line x1="175" y1="38" x2="130" y2="68" stroke="rgba(59,130,246,0.4)" stroke-width="1.5"/><line x1="235" y1="38" x2="280" y2="68" stroke="rgba(59,130,246,0.4)" stroke-width="1.5"/>
-        <rect x="90" y="68" width="80" height="28" rx="4" fill="#111827" stroke="rgba(59,130,246,0.3)" stroke-width="1.5"/><text x="130" y="82" text-anchor="middle" dominant-baseline="central" font-size="10" font-family="JetBrains Mono,monospace" fill="#60a5fa">Sub-prob 1</text>
-        <rect x="250" y="68" width="80" height="28" rx="4" fill="#111827" stroke="rgba(59,130,246,0.3)" stroke-width="1.5"/><text x="290" y="82" text-anchor="middle" dominant-baseline="central" font-size="10" font-family="JetBrains Mono,monospace" fill="#60a5fa">Sub-prob 2</text>
-        <line x1="130" y1="96" x2="130" y2="126" stroke="rgba(16,185,129,0.4)" stroke-width="1.5" stroke-dasharray="4"/><line x1="290" y1="96" x2="290" y2="126" stroke="rgba(16,185,129,0.4)" stroke-width="1.5" stroke-dasharray="4"/>
-        <rect x="90" y="126" width="80" height="28" rx="4" fill="rgba(16,185,129,0.1)" stroke="#10b981" stroke-width="1.5"/><text x="130" y="140" text-anchor="middle" dominant-baseline="central" font-size="10" font-family="JetBrains Mono,monospace" fill="#34d399">Solution 1</text>
-        <rect x="250" y="126" width="80" height="28" rx="4" fill="rgba(16,185,129,0.1)" stroke="#10b981" stroke-width="1.5"/><text x="290" y="140" text-anchor="middle" dominant-baseline="central" font-size="10" font-family="JetBrains Mono,monospace" fill="#34d399">Solution 2</text>
-        <line x1="170" y1="154" x2="205" y2="178" stroke="rgba(16,185,129,0.4)" stroke-width="1.5"/><line x1="250" y1="154" x2="215" y2="178" stroke="rgba(16,185,129,0.4)" stroke-width="1.5"/>
-        <rect x="155" y="178" width="100" height="28" rx="4" fill="rgba(59,130,246,0.15)" stroke="#3b82f6" stroke-width="2"/><text x="205" y="192" text-anchor="middle" dominant-baseline="central" font-size="11" font-family="JetBrains Mono,monospace" fill="#60a5fa">Combined</text>`;
-    }
-  },
-  'build-max-heap':{
-    explanation:'<strong>Build Max Heap</strong> converts any array into a max heap in <strong>O(n)</strong> — faster than inserting one-by-one (O(n log n)). Start heapify from the last non-leaf node at index <strong>n/2 - 1</strong> and work backward to index 0.',
-    points:['Start from index n/2 - 1 (last non-leaf)','Apply max-heapify downward for each node','O(n) total time — not O(n log n)','Foundation of heap sort phase 1'],
-    draw(svg){drawTree(svg,{val:10,left:{val:5,left:{val:4,left:null,right:null},right:{val:1,left:null,right:null}},right:{val:8,left:{val:3,left:null,right:null},right:{val:7,left:null,right:null}}},[10],[]);}
-  },
-  'max-heapify':{
-    explanation:'<strong>Max Heapify</strong> fixes a single violation: compare the node at index i with its left child (2i+1) and right child (2i+2). If a child is larger, swap and recurse down. Assumes both subtrees are already valid max heaps.',
-    points:['Compare node with both children','Swap with the largest child if needed','Recurse on the swapped child position','Stops when node is larger than both children'],
-    draw(svg){drawTree(svg,maxHeapTree,[16],[14]);}
+
+let arr=[], steps=[], stepIdx=0, done=false, autoRunning=false;
+function buildSteps(a, lo, hi, out=[]) {
+  if(lo>=hi) return out;
+  const mid=Math.floor((lo+hi)/2);
+  out.push({type:'split',lo,mid,hi});
+  buildSteps(a,lo,mid,out); buildSteps(a,mid+1,hi,out);
+  // simulate merge
+  const left=a.slice(lo,mid+1),right=a.slice(mid+1,hi+1);
+  let i=0,j=0,k=lo;
+  out.push({type:'mergeStart',lo,mid,hi,left:[...left],right:[...right]});
+  while(i<left.length&&j<right.length){
+    if(left[i]<=right[j]){out.push({type:'pick',from:'left',idx:lo+i,val:left[i],lo,hi});a[k++]=left[i++];}
+    else{out.push({type:'pick',from:'right',idx:mid+1+j,val:right[j],lo,hi});a[k++]=right[j++];}
   }
-};
-
-const cfg = dsaConfigs[SLUG];
-if (cfg) {
-  document.getElementById('pageExp').innerHTML = cfg.explanation;
-  document.getElementById('keyPts').innerHTML = cfg.points.map((p,i)=>`<div class="step-item ${i===0?'active-step':''}"><div class="step-num">${i+1}</div><div class="step-text">${p}</div></div>`).join('');
-  cfg.draw(document.getElementById('pageSvg'));
+  while(i<left.length){out.push({type:'pick',from:'left',idx:lo+i,val:left[i],lo,hi});a[k++]=left[i++];}
+  while(j<right.length){out.push({type:'pick',from:'right',idx:mid+1+j,val:right[j],lo,hi});a[k++]=right[j++];}
+  out.push({type:'merged',lo,hi,arr:[...a]});
+  return out;
 }
+function reset(){
+  const a=[...arr]; steps=buildSteps(a,0,arr.length-1); stepIdx=0; done=false; autoRunning=false;
+  cmp=[]; sortedR=[]; renderBase(); hl();
+}
+let cmp=[], sortedR=[];
+function renderBase(){
+  const mx=Math.max(...arr,1);
+  document.getElementById('bars').innerHTML=arr.map((v,k)=>
+    `<div class="bar${sortedR.some(([a,b])=>k>=a&&k<=b)?' sorted-bar':cmp.includes(k)?' comparing':''}" style="height:${Math.max(16,(v/mx)*130)}px">${v}</div>`).join('');
+  document.getElementById('arrv').innerHTML=arr.map((v,k)=>
+    `<div class="arr-cell${sortedR.some(([a,b])=>k>=a&&k<=b)?' sorted':cmp.includes(k)?' compare':''}" style="width:42px;height:42px">${v}<span class="idx">${k}</span></div>`).join('');
+}
+function doStep(){
+  if(done){log('Done. Reset first.');return;}
+  if(stepIdx>=steps.length){done=true;sortedR=[[0,arr.length-1]];cmp=[];renderBase();log('<strong>Sorted!</strong>','success-log');return;}
+  const s=steps[stepIdx++];
+  if(s.type==='split'){hl(1,2,3,4,5);cmp=[];log(`Split [${s.lo}..${s.hi}] → [${s.lo}..${s.mid}] + [${s.mid+1}..${s.hi}]`);}
+  else if(s.type==='mergeStart'){hl(8,9,10,11);cmp=[s.lo,s.hi];log(`Merging [${s.lo}..${s.mid}]=(${s.left}) with [${s.mid+1}..${s.hi}]=(${s.right})`,'highlight');}
+  else if(s.type==='pick'){hl(s.from==='left'?13:15,s.from==='left'?14:16);cmp=[s.idx];log(`Pick ${s.val} from ${s.from}`);}
+  else if(s.type==='merged'){hl(20);arr=[...s.arr];sortedR.push([s.lo,s.hi]);cmp=[];log(`Merged range [${s.lo}..${s.hi}].`,'highlight');}
+  renderBase();
+  document.getElementById('info').textContent=`Step ${stepIdx}/${steps.length}`;
+}
+async function autoRun(){
+  if(autoRunning)return;autoRunning=true;
+  document.getElementById('autoBtn').disabled=true;document.getElementById('stepBtn').disabled=true;
+  while(stepIdx<steps.length&&autoRunning){doStep();await sleep(spd());}
+  if(stepIdx>=steps.length){done=true;sortedR=[[0,arr.length-1]];cmp=[];renderBase();log('<strong>Sorted!</strong>','success-log');}
+  document.getElementById('autoBtn').disabled=false;document.getElementById('stepBtn').disabled=false;
+  autoRunning=false;
+}
+function shuffle(){arr=Array.from({length:8},()=>Math.floor(Math.random()*80)+10);cmp=[];sortedR=[];reset();log('Shuffled.');}
+function rst(){arr=[38,27,43,3,9,82,10,54];cmp=[];sortedR=[];reset();log('Reset.');}
+rst();
+
 </script>
 </body></html>

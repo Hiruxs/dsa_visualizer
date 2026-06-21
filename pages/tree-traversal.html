@@ -1,10 +1,14 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
 <title>Tree Traversal — DSA Visualizer</title>
 <link rel="stylesheet" href="../css/style.css">
 <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+.code-line{display:block;padding:2px 10px;border-left:3px solid transparent;transition:background .2s,border-left-color .2s;border-radius:0 4px 4px 0;white-space:pre;font-family:'JetBrains Mono',monospace;font-size:0.77rem;line-height:1.75}
+.code-line.hl{background:rgba(59,130,246,.18);border-left-color:#3b82f6}
+</style>
 </head>
 <body>
 <nav class="navbar"><div class="nav-brand"><span class="brand-icon">&lt;/&gt;</span><span class="brand-name">DSA Visualizer</span></div><div class="nav-links"><a href="../index.html#data-structures">Data Structures</a><a href="../index.html#algorithms">Algorithms</a></div></nav>
@@ -12,117 +16,125 @@
   <div class="viz-header">
     <a href="../index.html" class="back-link">← Back to Home</a>
     <h1>Tree Traversal</h1>
-    <p class="subtitle">Three ways to visit every node in a binary tree, each giving a different order.</p>
-    <div class="complexity-badges"><span class="badge badge-blue">All O(n)</span><span class="badge badge-green">Space O(h)</span></div>
+    <p class="subtitle">Three ways to visit every node — Inorder, Preorder, Postorder.</p>
+    <div class="complexity-badges"><span class="badge badge-green">All O(n)</span><span class="badge badge-blue">Space O(h)</span></div>
   </div>
   <div class="viz-layout">
     <div>
       <div class="viz-panel">
-        <div class="panel-title">Visualization — click a traversal to animate</div>
-        <div class="viz-canvas"><svg id="tvSvg" width="420" height="220" viewBox="0 0 420 220"></svg></div>
+        <div class="panel-title">Compare all three traversal orders side by side</div>
+        <div class="viz-canvas"><svg id="svg" width="440" height="230" viewBox="0 0 440 230"></svg></div>
+        <div style="padding:0.6rem 1.2rem;display:grid;grid-template-columns:1fr 1fr 1fr;gap:0.5rem">
+          <div><div style="font-size:0.7rem;color:#60a5fa;margin-bottom:3px;font-family:JetBrains Mono,monospace">INORDER</div><div id="v1" style="display:flex;gap:2px;flex-wrap:wrap;min-height:24px"></div></div>
+          <div><div style="font-size:0.7rem;color:#a78bfa;margin-bottom:3px;font-family:JetBrains Mono,monospace">PREORDER</div><div id="v2" style="display:flex;gap:2px;flex-wrap:wrap;min-height:24px"></div></div>
+          <div><div style="font-size:0.7rem;color:#34d399;margin-bottom:3px;font-family:JetBrains Mono,monospace">POSTORDER</div><div id="v3" style="display:flex;gap:2px;flex-wrap:wrap;min-height:24px"></div></div>
+        </div>
         <div class="controls">
           <div class="control-row">
-            <button class="ctrl-btn" onclick="runTraversal('inorder')">Inorder</button>
-            <button class="ctrl-btn secondary" onclick="runTraversal('preorder')">Preorder</button>
-            <button class="ctrl-btn secondary" onclick="runTraversal('postorder')">Postorder</button>
-            <button class="ctrl-btn secondary" onclick="tvReset()">Reset</button>
+            <input class="ctrl-input" id="val" type="number" placeholder="Value">
+            <button class="ctrl-btn secondary" onclick="ins()">Insert</button>
+            <button class="ctrl-btn secondary" onclick="rnd()">Random BST</button>
+            <button class="ctrl-btn secondary" onclick="rst()">Reset</button>
+          </div>
+          <div class="control-row">
+            <button class="ctrl-btn" onclick="runOne('inorder',3,8)">&#9654; Inorder</button>
+            <button class="ctrl-btn" onclick="runOne('preorder',10,15)">&#9654; Preorder</button>
+            <button class="ctrl-btn" onclick="runOne('postorder',17,22)">&#9654; Postorder</button>
+            <button class="ctrl-btn secondary" onclick="runAll()">&#9654; All Three</button>
+          </div>
+          <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:6px">
+            <span style="font-size:0.78rem;color:var(--text-muted)">Speed:</span>
+            <input type="range" id="spd" min="200" max="1200" value="600" style="width:100px">
+            <span style="font-size:0.78rem;color:var(--text-muted)">Fast</span>
           </div>
         </div>
-        <div style="padding:0.8rem 1.2rem">
-          <div style="font-size:0.75rem;color:var(--text-muted);margin-bottom:0.4rem;font-family:var(--font-mono)">Visit order:</div>
-          <div id="visitOrder" style="display:flex;gap:4px;flex-wrap:wrap;min-height:36px"></div>
-        </div>
-        <div class="info-log" id="tvLog"><div class="log-entry">Select a traversal type above.</div></div>
-      </div>
-      <div class="explanation" style="margin-top:1rem">
-        <p><strong>Three traversals — three different visit orders:</strong> <strong>Inorder</strong> (Left→Root→Right) gives sorted output for BSTs. <strong>Preorder</strong> (Root→Left→Right) is useful for copying a tree. <strong>Postorder</strong> (Left→Right→Root) is used when deleting nodes.</p>
+        <div class="info-log" id="log"><div class="log-entry">Ready.</div></div>
       </div>
     </div>
     <div>
       <div class="viz-panel">
-        <div class="panel-title">Comparison</div>
-        <div style="padding:1rem">
-          <div class="explanation"><p><strong>Inorder:</strong> Left → Root → Right<br>Result: <span style="color:var(--blue-light);font-family:var(--font-mono)">1, 3, 4, 6, 7, 8, 10, 13, 14</span></p></div>
-          <div class="explanation" style="margin-top:0.5rem"><p><strong>Preorder:</strong> Root → Left → Right<br>Result: <span style="color:var(--blue-light);font-family:var(--font-mono)">8, 3, 1, 6, 4, 7, 10, 14, 13</span></p></div>
-          <div class="explanation" style="margin-top:0.5rem"><p><strong>Postorder:</strong> Left → Right → Root<br>Result: <span style="color:var(--blue-light);font-family:var(--font-mono)">1, 4, 7, 6, 3, 13, 14, 10, 8</span></p></div>
-        </div>
-        <div class="code-panel" style="margin:0 0.8rem 0.8rem"><pre><span class="kw">function</span> <span class="fn">inorder</span>(node) {
-  <span class="kw">if</span> (!node) <span class="kw">return</span>;
-  <span class="fn">inorder</span>(node.left);   <span class="cm">// ←</span>
-  <span class="fn">visit</span>(node);          <span class="cm">// ●</span>
-  <span class="fn">inorder</span>(node.right);  <span class="cm">// →</span>
-}
-<span class="kw">function</span> <span class="fn">preorder</span>(node) {
-  <span class="kw">if</span> (!node) <span class="kw">return</span>;
-  <span class="fn">visit</span>(node);           <span class="cm">// ●</span>
-  <span class="fn">preorder</span>(node.left);   <span class="cm">// ←</span>
-  <span class="fn">preorder</span>(node.right);  <span class="cm">// →</span>
-}</pre></div>
+        <div class="panel-title">Pseudocode <small style="color:var(--text-muted);font-weight:400;font-size:0.7rem;margin-left:6px">— highlighted lines follow the animation</small></div>
+        <div class="code-panel" style="padding:0.4rem 0"><code>
+<span class="code-line" id="L1">// Three traversals compared:</span>
+<span class="code-line" id="L2"></span>
+<span class="code-line" id="L3">PROCEDURE inorder(node):</span>
+<span class="code-line" id="L4">  IF node is null THEN RETURN</span>
+<span class="code-line" id="L5">  inorder(node.left)   // 1. left first</span>
+<span class="code-line" id="L6">  VISIT node           // 2. then root</span>
+<span class="code-line" id="L7">  inorder(node.right)  // 3. then right</span>
+<span class="code-line" id="L8">END PROCEDURE</span>
+<span class="code-line" id="L9"></span>
+<span class="code-line" id="L10">PROCEDURE preorder(node):</span>
+<span class="code-line" id="L11">  IF node is null THEN RETURN</span>
+<span class="code-line" id="L12">  VISIT node           // 1. root first</span>
+<span class="code-line" id="L13">  preorder(node.left)</span>
+<span class="code-line" id="L14">  preorder(node.right)</span>
+<span class="code-line" id="L15">END PROCEDURE</span>
+<span class="code-line" id="L16"></span>
+<span class="code-line" id="L17">PROCEDURE postorder(node):</span>
+<span class="code-line" id="L18">  IF node is null THEN RETURN</span>
+<span class="code-line" id="L19">  postorder(node.left)</span>
+<span class="code-line" id="L20">  postorder(node.right)</span>
+<span class="code-line" id="L21">  VISIT node           // 3. root last</span>
+<span class="code-line" id="L22">END PROCEDURE</span>
+        </code></div>
       </div>
     </div>
   </div>
 </div>
 <script>
-const tree = {val:8,left:{val:3,left:{val:1,left:null,right:null},right:{val:6,left:{val:4,left:null,right:null},right:{val:7,left:null,right:null}}},right:{val:10,left:null,right:{val:14,left:{val:13,left:null,right:null},right:null}}};
-const positions = {};
 
-function layout(node,x,y,gap) {
-  if (!node) return;
-  positions[node.val]={x,y};
-  if (node.left) layout(node.left,x-gap,y+55,gap/2);
-  if (node.right) layout(node.right,x+gap,y+55,gap/2);
+const sleep=ms=>new Promise(r=>setTimeout(r,ms));
+const spd=()=>1400-parseInt(document.getElementById('spd').value);
+function hl(...ids){document.querySelectorAll('.code-line').forEach(l=>l.classList.remove('hl'));ids.forEach(n=>{const e=document.getElementById('L'+n);if(e)e.classList.add('hl');});}
+function log(m,t=''){const e=document.getElementById('log');if(e)e.innerHTML=`<div class="log-entry ${t}">${m}</div>`+e.innerHTML;}
+
+class TN{constructor(v){this.v=v;this.l=null;this.r=null;}}
+function insertBST(r,v){if(!r)return new TN(v);if(v<r.v)r.l=insertBST(r.l,v);else if(v>r.v)r.r=insertBST(r.r,v);return r;}
+function layout(n,x,y,g,ns=[],es=[]){
+  if(!n)return{ns,es};ns.push({v:n.v,x,y});
+  if(n.l){es.push({x1:x,y1:y,x2:x-g,y2:y+52});layout(n.l,x-g,y+52,g/1.7,ns,es);}
+  if(n.r){es.push({x1:x,y1:y,x2:x+g,y2:y+52});layout(n.r,x+g,y+52,g/1.7,ns,es);}
+  return{ns,es};
 }
-layout(tree,210,30,100);
-
-function getEdges(node,edges=[]) {
-  if (!node) return edges;
-  if (node.left) { const p=positions[node.val],c=positions[node.left.val]; edges.push({x1:p.x,y1:p.y,x2:c.x,y2:c.y}); getEdges(node.left,edges); }
-  if (node.right) { const p=positions[node.val],c=positions[node.right.val]; edges.push({x1:p.x,y1:p.y,x2:c.x,y2:c.y}); getEdges(node.right,edges); }
-  return edges;
+function drawTree(svgId,root,active=null,visited=[]){
+  const svg=document.getElementById(svgId);
+  if(!root){svg.innerHTML='<text x="220" y="120" text-anchor="middle" fill="#4a5568" font-size="13" font-family="Inter">Empty tree — insert values</text>';return;}
+  const{ns,es}=layout(root,220,28,100);
+  svg.innerHTML=es.map(e=>`<line x1="${e.x1}" y1="${e.y1}" x2="${e.x2}" y2="${e.y2}" stroke="rgba(255,255,255,0.12)" stroke-width="2"/>`).join('')+
+    ns.map(n=>{const a=n.v===active,vi=visited.includes(n.v);return`<circle cx="${n.x}" cy="${n.y}" r="20" fill="${a?'rgba(59,130,246,0.28)':vi?'rgba(16,185,129,0.15)':'#111827'}" stroke="${a?'#3b82f6':vi?'#10b981':'rgba(255,255,255,0.12)'}" stroke-width="2"/><text x="${n.x}" y="${n.y}" text-anchor="middle" dominant-baseline="central" font-family="JetBrains Mono,monospace" font-size="12" fill="${a?'#60a5fa':vi?'#34d399':'#f0f4ff'}">${n.v}</text>`;}).join('');
 }
-
-function renderTree(highlighted=[],visited=[]) {
-  const svg=document.getElementById('tvSvg');
-  const edges=getEdges(tree);
-  svg.innerHTML=edges.map(e=>`<line x1="${e.x1}" y1="${e.y1}" x2="${e.x2}" y2="${e.y2}" class="edge-line"/>`).join('')+
-    Object.entries(positions).map(([v,p])=>`
-      <circle cx="${p.x}" cy="${p.y}" r="20" class="node-circle ${highlighted.includes(+v)?'active-node':''} ${visited.includes(+v)?'sorted-node':''}"/>
-      <text x="${p.x}" y="${p.y}" class="node-text" font-size="12">${v}</text>`).join('');
+function rndBST(){
+  let r=null;
+  const pool=Array.from({length:40},(_,i)=>(i+1)*2+5);
+  for(let i=pool.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[pool[i],pool[j]]=[pool[j],pool[i]];}
+  pool.slice(0,9).forEach(v=>{r=insertBST(r,v);});
+  return r;
 }
+function getOrder(n,type,res=[]){if(!n)return res;if(type==='preorder')res.push(n.v);getOrder(n.l,type,res);if(type==='inorder')res.push(n.v);getOrder(n.r,type,res);if(type==='postorder')res.push(n.v);return res;}
 
-function getOrder(node,type,order=[]) {
-  if (!node) return order;
-  if (type==='preorder') order.push(node.val);
-  getOrder(node.left,type,order);
-  if (type==='inorder') order.push(node.val);
-  getOrder(node.right,type,order);
-  if (type==='postorder') order.push(node.val);
-  return order;
-}
-
-function log(msg,type='') { const el=document.getElementById('tvLog'); el.innerHTML=`<div class="log-entry ${type}">${msg}</div>`+el.innerHTML; }
-
-async function runTraversal(type) {
-  const order=getOrder(tree,type);
-  const visited=[];
-  document.getElementById('visitOrder').innerHTML='';
-  log(`Starting <strong>${type}</strong> traversal...`,'highlight');
-  for (let i=0;i<order.length;i++) {
+let root=null;
+function draw(active=null,visited=[]){drawTree('svg',root,active,visited);}
+function addPill(id,v,color){const e=document.createElement('div');e.style.cssText=`padding:2px 8px;background:rgba(${color},.12);border:1px solid rgba(${color},.4);border-radius:4px;font-family:var(--font-mono);font-size:0.75rem;color:rgba(${color},1)`;e.textContent=v;document.getElementById(id).appendChild(e);}
+async function runOne(type,cStart,cEnd){
+  if(!root){log('Build a tree first.');return;}
+  const id=type==='inorder'?'v1':type==='preorder'?'v2':'v3';
+  const color=type==='inorder'?'96,165,250':type==='preorder'?'167,139,250':'52,211,153';
+  document.getElementById(id).innerHTML='';
+  const order=getOrder(root,type),visited=[];
+  hl(...Array.from({length:cEnd-cStart+1},(_,k)=>cStart+k));
+  log(`<strong>${type} traversal started...</strong>`,'highlight');
+  for(let i=0;i<order.length;i++){
+    draw(order[i],visited.slice());await sleep(spd());
+    addPill(id,order[i],color);log(`Visit <strong>${order[i]}</strong>`);
     visited.push(order[i]);
-    renderTree([order[i]],visited.slice(0,-1));
-    const el=document.getElementById('visitOrder');
-    const span=document.createElement('div');
-    span.style.cssText='padding:4px 10px;background:var(--blue-glow);border:1px solid var(--blue-border);border-radius:4px;font-family:var(--font-mono);font-size:0.8rem;color:var(--blue-light)';
-    span.textContent=order[i];
-    el.appendChild(span);
-    log(`Visiting node <strong>${order[i]}</strong>`);
-    await new Promise(r=>setTimeout(r,700));
   }
-  renderTree([],order);
-  log(`<strong>${type} complete!</strong> Order: ${order.join(' → ')}`, 'success-log');
+  draw(null,visited);log(`<strong>${type}:</strong> ${order.join(' → ')}`,'success-log');
 }
-
-function tvReset() { renderTree(); document.getElementById('visitOrder').innerHTML=''; log('Reset. Choose a traversal type.'); }
-renderTree();
+async function runAll(){['v1','v2','v3'].forEach(id=>{document.getElementById(id).innerHTML='';});await runOne('inorder',3,8);await runOne('preorder',10,15);await runOne('postorder',17,22);}
+function ins(){const v=parseInt(document.getElementById('val').value);if(isNaN(v))return;root=insertBST(root,v);log(`Inserted ${v}.`,'highlight');draw();}
+function rnd(){root=rndBST();['v1','v2','v3'].forEach(id=>{document.getElementById(id).innerHTML='';});log('New random BST generated.','highlight');draw();}
+function rst(){root=null;['v1','v2','v3'].forEach(id=>{document.getElementById(id).innerHTML='';});log('Reset.');draw();hl();}
+rnd();
 </script>
 </body></html>

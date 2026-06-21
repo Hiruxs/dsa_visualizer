@@ -1,419 +1,244 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
 <title>Linked List — DSA Visualizer</title>
 <link rel="stylesheet" href="../css/style.css">
 <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <style>
-.mode-tabs { display: flex; gap: 0.5rem; padding: 1rem 1.2rem 0; }
-.mode-tab {
-  flex: 1; padding: 0.6rem 0.8rem; background: var(--bg-secondary);
-  border: 1px solid var(--border); border-radius: 8px; cursor: pointer;
-  font-size: 0.82rem; color: var(--text-secondary); text-align: center;
-  transition: all 0.2s; font-family: var(--font-main); font-weight: 500;
-}
-.mode-tab:hover { border-color: var(--blue-border); color: var(--blue-light); }
-.mode-tab.active { background: var(--blue-glow); border-color: var(--blue-primary); color: var(--blue-light); }
-
-/* Doubly linked node */
-.dll-box {
-  display: flex; border: 2px solid var(--border); border-radius: 6px; overflow: hidden;
-  font-family: var(--font-mono); font-size: 0.78rem; transition: all 0.3s;
-}
-.dll-prev, .dll-next-ptr {
-  padding: 0.5rem 0.4rem; background: var(--bg-primary);
-  color: var(--text-muted); font-size: 0.7rem;
-  display: flex; align-items: center;
-}
-.dll-prev { border-right: 2px solid var(--border); }
-.dll-next-ptr { border-left: 2px solid var(--border); }
-.dll-data { padding: 0.5rem 0.7rem; background: var(--bg-secondary); font-weight: 600; font-size: 0.85rem; }
-.dll-box.head-node { border-color: var(--blue-primary); }
-.dll-box.head-node .dll-data { background: var(--blue-glow); color: var(--blue-light); }
-.dll-box.tail-node { border-color: var(--success); }
-.dll-box.tail-node .dll-data { background: rgba(16,185,129,0.1); color: #34d399; }
-.dll-box.active { border-color: var(--warning); }
-.dll-box.active .dll-data { background: rgba(245,158,11,0.15); color: var(--warning); }
-
-.dll-arrows {
-  display: flex; flex-direction: column; gap: 2px;
-  padding: 0 0.4rem; color: var(--blue-primary); font-size: 0.9rem;
-}
-.head-tail-bar {
-  display: flex; justify-content: space-around; width: 100%;
-  max-width: 480px; font-size: 0.7rem; color: var(--text-muted);
-  font-family: var(--font-mono); margin-bottom: 0.5rem;
-}
-.head-label { color: var(--blue-light); }
-.tail-label { color: #34d399; }
+.code-line{display:block;padding:2px 10px;border-left:3px solid transparent;transition:background .2s,border-left-color .2s;border-radius:0 4px 4px 0;white-space:pre;font-family:'JetBrains Mono',monospace;font-size:0.77rem;line-height:1.75}
+.code-line.hl{background:rgba(59,130,246,.18);border-left-color:#3b82f6}
+.kw{color:#c792ea}.fn{color:#82aaff}.cm{color:#546e7a;font-style:italic}.nm{color:#f78c6c}.st{color:#c3e88d}.ty{color:#7dcfff}
+.tab-btn{padding:7px 16px;border-radius:6px 6px 0 0;border:1px solid rgba(255,255,255,0.1);background:transparent;color:var(--text-muted);cursor:pointer;font-family:inherit;font-size:0.82rem;transition:all .15s;border-bottom:none}
+.tab-btn.active{background:rgba(59,130,246,0.15);color:#60a5fa;border-color:#3b82f6}
 </style>
 </head>
 <body>
-<nav class="navbar">
-  <div class="nav-brand"><span class="brand-icon">&lt;/&gt;</span><span class="brand-name">DSA Visualizer</span></div>
-  <div class="nav-links"><a href="../index.html#data-structures">Data Structures</a><a href="../index.html#algorithms">Algorithms</a></div>
-</nav>
-
+<nav class="navbar"><div class="nav-brand"><span class="brand-icon">&lt;/&gt;</span><span class="brand-name">DSA Visualizer</span></div><div class="nav-links"><a href="../index.html#data-structures">Data Structures</a><a href="../index.html#algorithms">Algorithms</a></div></nav>
 <div class="viz-page">
   <div class="viz-header">
     <a href="../index.html" class="back-link">← Back to Home</a>
     <h1>Linked List</h1>
-    <p class="subtitle" id="subtitle">A chain of nodes where each node holds data and pointers to neighbors.</p>
-    <div class="complexity-badges">
-      <span class="badge badge-green">Insert Head O(1)</span>
-      <span class="badge badge-blue">Search O(n)</span>
-      <span class="badge badge-yellow">Insert Middle O(n)</span>
-    </div>
+    <p class="subtitle">Nodes connected by pointers — dynamic size, flexible insertions.</p>
+    <div class="complexity-badges"><span class="badge badge-green">Add Head O(1)</span><span class="badge badge-blue">Add Tail O(n)</span><span class="badge badge-blue">Search O(n)</span><span class="badge badge-blue">Add/Del at Index O(n)</span></div>
   </div>
-
   <div class="viz-layout">
     <div>
       <div class="viz-panel">
-        <div class="mode-tabs">
-          <div class="mode-tab active" onclick="switchMode('singly')">Singly Linked List</div>
-          <div class="mode-tab" onclick="switchMode('doubly')">Doubly Linked List</div>
+        <div style="display:flex;gap:0;padding:0 1rem;border-bottom:1px solid rgba(255,255,255,0.08);margin-bottom:0.8rem">
+          <button class="tab-btn active" id="tabS" onclick="switchMode('singly')">Singly Linked</button>
+          <button class="tab-btn" id="tabD" onclick="switchMode('doubly')">Doubly Linked</button>
         </div>
-        <div class="panel-title" style="border-top:1px solid var(--border);margin-top:1rem">Visualization</div>
-        <div class="viz-canvas" style="overflow-x:auto;flex-direction:column;gap:0.5rem">
-          <div class="head-tail-bar" id="headTailBar"><span class="head-label">HEAD ↓</span></div>
-          <div class="ll-viz" id="llViz" style="flex-wrap:wrap;gap:4px"></div>
-        </div>
-
+        <div class="panel-title" id="modeLabel">Singly Linked List — one-directional pointers</div>
+        <div class="viz-canvas"><svg id="svg" width="440" height="110" viewBox="0 0 440 110"></svg></div>
         <div class="controls">
-          <div style="font-size:0.75rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:0.2rem">Basic Operations</div>
           <div class="control-row">
-            <input class="ctrl-input" id="llVal" type="number" placeholder="Value">
-            <button class="ctrl-btn" onclick="llPrepend()">Add Head</button>
-            <button class="ctrl-btn secondary" onclick="llAppend()">Add Tail</button>
-          </div>
-
-          <div style="font-size:0.75rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.05em;margin-top:0.4rem;margin-bottom:0.2rem">Position-Based Operations</div>
-          <div class="control-row">
-            <input class="ctrl-input" id="llTarget" type="number" placeholder="After value">
-            <input class="ctrl-input" id="llNewVal" type="number" placeholder="New value">
-            <button class="ctrl-btn" onclick="llInsertAfter()">Insert After</button>
+            <input class="ctrl-input" id="val" type="number" placeholder="Value" style="width:70px">
+            <input class="ctrl-input" id="idx" type="number" placeholder="Index" style="width:60px">
+            <button class="ctrl-btn" onclick="addF()">Add Head</button>
+            <button class="ctrl-btn" onclick="addL()">Add Tail</button>
+            <button class="ctrl-btn secondary" onclick="addAt()">Add at Index</button>
           </div>
           <div class="control-row">
-            <input class="ctrl-input" id="llBeforeTarget" type="number" placeholder="Before value">
-            <input class="ctrl-input" id="llBeforeNew" type="number" placeholder="New value">
-            <button class="ctrl-btn" onclick="llInsertBefore()">Insert Before</button>
+            <button class="ctrl-btn danger" onclick="remF()">Del Head</button>
+            <button class="ctrl-btn danger" onclick="remL()">Del Tail</button>
+            <button class="ctrl-btn danger" onclick="delAt()">Del at Index</button>
+            <button class="ctrl-btn secondary" onclick="srch()">Search</button>
+            <button class="ctrl-btn secondary" onclick="rev()">Reverse</button>
+            <button class="ctrl-btn secondary" onclick="rst()">Reset</button>
           </div>
-
-          <div style="font-size:0.75rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.05em;margin-top:0.4rem;margin-bottom:0.2rem">Delete & Search</div>
-          <div class="control-row">
-            <button class="ctrl-btn danger" onclick="llDeleteHead()">Del Head</button>
-            <button class="ctrl-btn danger" onclick="llDeleteTail()">Del Tail</button>
-            <button class="ctrl-btn danger" onclick="llDeleteValue()">Del by Value</button>
-          </div>
-          <div class="control-row">
-            <input class="ctrl-input" id="llDelAfterVal" type="number" placeholder="Delete after value">
-            <button class="ctrl-btn danger" onclick="llDeleteAfter()">Delete After</button>
-          </div>
-          <div class="control-row">
-            <button class="ctrl-btn secondary" onclick="llSearch()">Search</button>
-            <button class="ctrl-btn secondary" onclick="llReverse()">Reverse</button>
-            <button class="ctrl-btn secondary" onclick="llReset()">Reset</button>
+          <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:6px">
+            <span style="font-size:0.78rem;color:var(--text-muted)">Speed:</span>
+            <input type="range" id="spd" min="200" max="1200" value="600" style="width:100px">
+            <span style="font-size:0.78rem;color:var(--text-muted)">Fast</span>
           </div>
         </div>
-        <div class="info-log" id="llLog"><div class="log-entry">Singly linked list initialized with 4 nodes.</div></div>
+        <div class="info-log" id="log"><div class="log-entry">Ready. Switch between Singly and Doubly modes above.</div></div>
       </div>
-
-      <div class="explanation" style="margin-top:1rem">
-        <p id="modeExplanation"><strong>Singly Linked List:</strong> Each node has data and a single <code>next</code> pointer. Memory-efficient (one pointer per node), but you can only traverse <strong>one direction</strong>. To go back, you must restart from HEAD.</p>
-      </div>
+      <div class="explanation" style="margin-top:1rem"><p id="expl">Singly linked: each node holds data and one pointer to the <strong>next</strong> node. No pointer back. Traversal is one-directional. Add/delete at head is O(1); all other position operations need O(n) traversal first.</p></div>
     </div>
-
     <div>
       <div class="viz-panel">
-        <div class="panel-title">Node Structure</div>
-        <div class="code-panel" id="codePanel"></div>
-
-        <div class="panel-title" style="margin-top:1rem">Operations Reference</div>
-        <div class="stepper" style="padding:1rem">
-          <div class="step-item active-step"><div class="step-num">1</div><div class="step-text"><strong>Add Head:</strong> O(1) — just point new node to old head</div></div>
-          <div class="step-item"><div class="step-num">2</div><div class="step-text"><strong>Insert After:</strong> O(n) — find node, then link in O(1)</div></div>
-          <div class="step-item"><div class="step-num">3</div><div class="step-text"><strong>Delete After:</strong> O(n) — find node, bypass its next</div></div>
-          <div class="step-item"><div class="step-num">4</div><div class="step-text"><strong>Reverse:</strong> O(n) — flip every pointer using 3 variables</div></div>
-        </div>
-      </div>
-
-      <div class="viz-panel" style="margin-top:1rem">
-        <div class="panel-title">Singly vs Doubly</div>
-        <div style="padding:1rem;font-size:0.82rem;color:var(--text-secondary);line-height:1.7">
-          <p style="margin-bottom:0.5rem"><strong style="color:var(--blue-light)">Singly:</strong> 1 pointer per node (next). Less memory. One-direction traversal.</p>
-          <p><strong style="color:#34d399">Doubly:</strong> 2 pointers per node (prev + next). More memory. Both directions traversal, easier deletion.</p>
-        </div>
+        <div class="panel-title">Pseudocode <small style="color:var(--text-muted);font-weight:400;font-size:0.7rem;margin-left:6px">— highlighted lines follow the animation</small></div>
+        <div id="codeS" class="code-panel" style="padding:0.4rem 0"><code>
+<span class="code-line" id="L1">NODE: data, next pointer</span>
+<span class="code-line" id="L2">SINGLY LINKED LIST: head pointer</span>
+<span class="code-line" id="L3"></span>
+<span class="code-line" id="L4">PROCEDURE addFirst(val):</span>
+<span class="code-line" id="L5">  new_node ← create node(val)</span>
+<span class="code-line" id="L6">  new_node.next ← head</span>
+<span class="code-line" id="L7">  head ← new_node</span>
+<span class="code-line" id="L8">END PROCEDURE</span>
+<span class="code-line" id="L9"></span>
+<span class="code-line" id="L10">PROCEDURE addAt(index, val):</span>
+<span class="code-line" id="L11">  IF index = 0 THEN addFirst(val)</span>
+<span class="code-line" id="L12">  cur ← head, step ← 0</span>
+<span class="code-line" id="L13">  WHILE step &lt; index - 1:</span>
+<span class="code-line" id="L14">    cur ← cur.next</span>
+<span class="code-line" id="L15">    step ← step + 1</span>
+<span class="code-line" id="L16">  new_node.next ← cur.next</span>
+<span class="code-line" id="L17">  cur.next ← new_node</span>
+<span class="code-line" id="L18">END PROCEDURE</span>
+<span class="code-line" id="L19"></span>
+<span class="code-line" id="L20">PROCEDURE deleteAt(index):</span>
+<span class="code-line" id="L21">  IF index = 0 THEN head ← head.next</span>
+<span class="code-line" id="L22">  cur ← head, step ← 0</span>
+<span class="code-line" id="L23">  WHILE step &lt; index - 1:</span>
+<span class="code-line" id="L24">    cur ← cur.next</span>
+<span class="code-line" id="L25">  cur.next ← cur.next.next</span>
+<span class="code-line" id="L26">END PROCEDURE</span>
+<span class="code-line" id="L27"></span>
+<span class="code-line" id="L28">PROCEDURE reverse():</span>
+<span class="code-line" id="L29">  prev ← null, cur ← head</span>
+<span class="code-line" id="L30">  WHILE cur ≠ null:</span>
+<span class="code-line" id="L31">    next ← cur.next</span>
+<span class="code-line" id="L32">    cur.next ← prev</span>
+<span class="code-line" id="L33">    prev ← cur</span>
+<span class="code-line" id="L34">    cur ← next</span>
+<span class="code-line" id="L35">  head ← prev</span>
+<span class="code-line" id="L36">END PROCEDURE</span>
+        </code></div>
+        <div id="codeD" class="code-panel" style="padding:0.4rem 0;display:none"><code>
+<span class="code-line" id="D1">NODE: data, next, prev pointer</span>
+<span class="code-line" id="D2">DOUBLY LINKED LIST: head, tail</span>
+<span class="code-line" id="D3"></span>
+<span class="code-line" id="D4">PROCEDURE addFirst(val):</span>
+<span class="code-line" id="D5">  new_node ← create node(val)</span>
+<span class="code-line" id="D6">  new_node.next ← head</span>
+<span class="code-line" id="D7">  IF head ≠ null THEN head.prev ← new_node</span>
+<span class="code-line" id="D8">  head ← new_node</span>
+<span class="code-line" id="D9">END PROCEDURE</span>
+<span class="code-line" id="D10"></span>
+<span class="code-line" id="D11">PROCEDURE addAt(index, val):</span>
+<span class="code-line" id="D12">  cur ← head, step ← 0</span>
+<span class="code-line" id="D13">  WHILE step &lt; index - 1:</span>
+<span class="code-line" id="D14">    cur ← cur.next</span>
+<span class="code-line" id="D15">  new_node.next ← cur.next</span>
+<span class="code-line" id="D16">  new_node.prev ← cur</span>
+<span class="code-line" id="D17">  IF cur.next ≠ null THEN</span>
+<span class="code-line" id="D18">    cur.next.prev ← new_node</span>
+<span class="code-line" id="D19">  cur.next ← new_node</span>
+<span class="code-line" id="D20">END PROCEDURE</span>
+<span class="code-line" id="D21"></span>
+<span class="code-line" id="D22">PROCEDURE deleteAt(index):</span>
+<span class="code-line" id="D23">  cur ← node at index</span>
+<span class="code-line" id="D24">  IF cur.prev ≠ null:</span>
+<span class="code-line" id="D25">    cur.prev.next ← cur.next</span>
+<span class="code-line" id="D26">  IF cur.next ≠ null:</span>
+<span class="code-line" id="D27">    cur.next.prev ← cur.prev</span>
+<span class="code-line" id="D28">END PROCEDURE</span>
+        </code></div>
       </div>
     </div>
   </div>
 </div>
-
 <script>
+const sleep = ms => new Promise(r => setTimeout(r, ms));
+const spd = () => 1400 - parseInt(document.getElementById('spd').value);
 let mode = 'singly';
-let list = [10, 20, 30, 40];
-let highlighted = -1;
+function hl(...ids){
+  document.querySelectorAll('.code-line').forEach(l=>l.classList.remove('hl'));
+  const prefix = mode==='doubly'?'D':'L';
+  ids.forEach(n=>{const e=document.getElementById(prefix+n);if(e)e.classList.add('hl');});
+}
+function log(m,t=''){const e=document.getElementById('log');e.innerHTML=`<div class="log-entry ${t}">${m}</div>`+e.innerHTML;}
 
-// ===== RENDER =====
-function render() {
-  const viz = document.getElementById('llViz');
-  const bar = document.getElementById('headTailBar');
-  if (list.length === 0) {
-    viz.innerHTML = '<div style="color:var(--text-muted)">Empty list → NULL</div>';
-    bar.innerHTML = '<span style="color:var(--text-muted)">Empty</span>';
-    return;
+let list=[10,20,30,40]; let hiIdx=[];
+function switchMode(m){
+  mode=m;
+  document.getElementById('tabS').classList.toggle('active',m==='singly');
+  document.getElementById('tabD').classList.toggle('active',m==='doubly');
+  document.getElementById('codeS').style.display=m==='singly'?'':'none';
+  document.getElementById('codeD').style.display=m==='doubly'?'':'none';
+  document.getElementById('modeLabel').textContent=m==='singly'?'Singly Linked List — one-directional pointers':'Doubly Linked List — bidirectional pointers';
+  document.getElementById('expl').innerHTML=m==='singly'
+    ?'Singly linked: each node holds data and one pointer to the <strong>next</strong> node. Traversal is one-directional. Add/delete at head is O(1); all other positions need O(n) traversal first.'
+    :'Doubly linked: each node has <strong>next</strong> and <strong>prev</strong> pointers. Traversal works both ways. Deleting a known node is O(1) since we can unlink without traversing from head.';
+  render();hl();
+}
+
+function render(){
+  const svg=document.getElementById('svg'),n=list.length,doubly=mode==='doubly';
+  if(!n){svg.innerHTML='<text x="220" y="55" text-anchor="middle" fill="#4a5568" font-size="13" font-family="Inter">Empty list</text>';return;}
+  const ew=58,gap=doubly?28:22,total=n*ew+(n-1)*gap,sx=Math.max(8,(440-total)/2);
+  let h='';
+  for(let i=0;i<n;i++){
+    const x=sx+i*(ew+gap),y=28,hi=hiIdx.includes(i);
+    h+=`<rect x="${x}" y="${y}" width="${ew}" height="32" rx="7" fill="${hi?'rgba(59,130,246,0.22)':'#111827'}" stroke="${hi?'#3b82f6':'rgba(255,255,255,0.12)'}" stroke-width="2"/>
+      <text x="${x+ew/2}" y="${y+18}" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="13" fill="${hi?'#60a5fa':'#f0f4ff'}">${list[i]}</text>`;
+    if(i<n-1){
+      const ax=x+ew+2,aw=gap-4;
+      h+=`<line x1="${ax}" y1="${y+16}" x2="${ax+aw}" y2="${y+16}" stroke="rgba(59,130,246,0.5)" stroke-width="1.5" marker-end="url(#arr)"/>`;
+      if(doubly)h+=`<line x1="${ax+aw}" y1="${y+20}" x2="${ax}" y2="${y+20}" stroke="rgba(167,139,250,0.5)" stroke-width="1.5" marker-end="url(#arrl)"/>`;
+    } else {
+      h+=`<text x="${x+ew+4}" y="${y+19}" font-size="9" fill="#4a5568" font-family="JetBrains Mono,monospace">null</text>`;
+    }
+    if(i===0)h+=`<text x="${x+ew/2}" y="${y+50}" text-anchor="middle" font-size="9" fill="#3b82f6" font-family="JetBrains Mono,monospace">HEAD</text>`;
+    if(i===n-1&&doubly)h+=`<text x="${x+ew/2}" y="${y+50}" text-anchor="middle" font-size="9" fill="#10b981" font-family="JetBrains Mono,monospace">TAIL</text>`;
   }
+  svg.innerHTML=`<defs>
+    <marker id="arr" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 Z" fill="rgba(59,130,246,0.7)"/></marker>
+    <marker id="arrl" markerWidth="6" markerHeight="6" refX="1" refY="3" orient="auto"><path d="M6,0 L0,3 L6,6 Z" fill="rgba(167,139,250,0.6)"/></marker>
+  </defs>`+h;
+}
 
-  if (mode === 'singly') {
-    bar.innerHTML = '<span class="head-label">HEAD ↓</span>';
-    viz.innerHTML = list.map((v, i) => `
-      <div class="ll-node">
-        <div class="ll-box ${i===0?'head-node':''} ${i===highlighted?'active':''}" style="${i===highlighted?'border-color:var(--warning) !important':''}">
-          <div class="ll-data" style="${i===highlighted?'background:rgba(245,158,11,0.15);color:var(--warning)':''}">${v}</div>
-          <div class="ll-next">→</div>
-        </div>
-        <div class="ll-arrow">→</div>
-      </div>`).join('') + '<div class="ll-null">NULL</div>';
-  } else {
-    // doubly
-    let headTailHtml = '<span class="head-label">HEAD ↓</span>';
-    headTailHtml += '<span class="tail-label">↓ TAIL</span>';
-    bar.innerHTML = headTailHtml;
-
-    viz.innerHTML = '<div class="ll-null">NULL</div>' + list.map((v, i) => {
-      let cls = 'dll-box';
-      if (i === 0) cls += ' head-node';
-      if (i === list.length-1) cls += ' tail-node';
-      if (i === highlighted) cls += ' active';
-      return `
-        ${i>0?'<div class="dll-arrows">⇄</div>':'<div class="dll-arrows">⇄</div>'}
-        <div class="${cls}">
-          <div class="dll-prev">P</div>
-          <div class="dll-data">${v}</div>
-          <div class="dll-next-ptr">N</div>
-        </div>`;
-    }).join('') + '<div class="dll-arrows">⇄</div><div class="ll-null">NULL</div>';
+async function addF(){
+  const v=parseInt(document.getElementById('val').value);if(isNaN(v))return;
+  hl(4,5,6,7);log(`addFirst(${v}): new node → points to old head`,'highlight');
+  await sleep(spd());list.unshift(v);hiIdx=[0];render();await sleep(spd()/2);hiIdx=[];render();
+}
+async function addL(){
+  const v=parseInt(document.getElementById('val').value);if(isNaN(v))return;
+  if(!list.length){list.push(v);hiIdx=[0];render();log(`List empty — ${v} becomes head.`,'highlight');await sleep(spd()/2);hiIdx=[];render();return;}
+  hl(12,13);log(`addLast: traverse to tail...`,'highlight');
+  for(let i=0;i<list.length;i++){hl(13,14);hiIdx=[i];render();await sleep(spd()/2);}
+  list.push(v);hiIdx=[list.length-1];render();log(`addLast(${v}) — appended at tail.`,'highlight');await sleep(spd()/2);hiIdx=[];render();
+}
+async function addAt(){
+  const v=parseInt(document.getElementById('val').value);
+  const idx=parseInt(document.getElementById('idx').value);
+  if(isNaN(v)||isNaN(idx)){log('Enter both a value and an index.');return;}
+  if(idx<0||idx>list.length){log(`Index must be 0 to ${list.length}.`);return;}
+  if(idx===0){await addF();return;}
+  hl(10,11,12);log(`addAt(${idx}, ${v}): traverse to position ${idx-1}...`,'highlight');await sleep(spd());
+  for(let i=0;i<idx-1;i++){hl(13,14,15);hiIdx=[i];render();await sleep(spd());}
+  hl(16,17);list.splice(idx,0,v);hiIdx=[idx];render();
+  log(`Inserted <strong>${v}</strong> at index ${idx}. Rewired pointers.`,'highlight');await sleep(spd()/2);hiIdx=[];render();
+}
+async function remF(){
+  if(!list.length){log('List empty.');return;}
+  hl(20,21);hiIdx=[0];render();await sleep(spd());
+  const v=list.shift();hiIdx=[];render();log(`Removed head <strong>${v}</strong>.`,'highlight');
+}
+async function remL(){
+  if(!list.length){log('List empty.');return;}
+  hl(22,23);log(`Traverse to second-to-last...`,'highlight');
+  for(let i=0;i<list.length-1;i++){hiIdx=[i];render();await sleep(spd()/2);}
+  const v=list.pop();hiIdx=[];render();log(`Removed tail <strong>${v}</strong>.`,'highlight');
+}
+async function delAt(){
+  const idx=parseInt(document.getElementById('idx').value);
+  if(isNaN(idx)||idx<0||idx>=list.length){log(`Enter valid index (0 to ${list.length-1}).`);return;}
+  if(idx===0){await remF();return;}
+  hl(20,21,22,23,24);log(`deleteAt(${idx}): traverse to position ${idx-1}...`,'highlight');await sleep(spd());
+  for(let i=0;i<idx;i++){hiIdx=[i];render();await sleep(spd()/2);}
+  hl(25);const v=list.splice(idx,1)[0];hiIdx=[];render();log(`Deleted <strong>${v}</strong> at index ${idx}. Rewired pointers.`,'highlight');
+}
+async function srch(){
+  const v=parseInt(document.getElementById('val').value);if(isNaN(v))return;
+  log(`Search for <strong>${v}</strong>...`,'highlight');
+  for(let i=0;i<list.length;i++){
+    hl(13,14);hiIdx=[i];render();await sleep(spd());
+    if(list[i]===v){log(`Found <strong>${v}</strong> at index ${i}.`,'success-log');return;}
   }
+  hiIdx=[];render();log(`${v} not found.`);
 }
-
-function log(msg, type='') {
-  const el = document.getElementById('llLog');
-  el.innerHTML = `<div class="log-entry ${type}">${msg}</div>` + el.innerHTML;
+async function rev(){
+  hl(28,29);log(`Reversing list...`,'highlight');await sleep(spd());
+  for(let i=0;i<list.length;i++){hl(30,31,32,33,34);hiIdx=[i];render();await sleep(spd()/2);}
+  list.reverse();hl(35);hiIdx=[];render();log(`Reversed! New head = ${list[0]}.`,'highlight');
 }
-
-// ===== MODE SWITCHING =====
-function switchMode(m) {
-  mode = m;
-  document.querySelectorAll('.mode-tab').forEach(t => t.classList.remove('active'));
-  event.target.classList.add('active');
-  list = [10, 20, 30, 40];
-  highlighted = -1;
-  updateCodePanel();
-  updateExplanation();
-  log(`Switched to <strong>${m === 'singly' ? 'Singly' : 'Doubly'} Linked List</strong>`, 'highlight');
-  render();
-}
-
-function updateExplanation() {
-  const el = document.getElementById('modeExplanation');
-  if (mode === 'singly') {
-    el.innerHTML = '<strong>Singly Linked List:</strong> Each node has data and a single <code>next</code> pointer. Memory-efficient (one pointer per node), but you can only traverse <strong>one direction</strong>. To go back, you must restart from HEAD.';
-  } else {
-    el.innerHTML = '<strong>Doubly Linked List:</strong> Each node has <code>prev</code> AND <code>next</code> pointers. Uses more memory but allows <strong>bidirectional traversal</strong>. Deletion is faster because you can access the previous node directly without re-traversing.';
-  }
-}
-
-function updateCodePanel() {
-  const cp = document.getElementById('codePanel');
-  if (mode === 'singly') {
-    cp.innerHTML = `<pre><span class="kw">class</span> <span class="fn">Node</span> {
-  <span class="fn">constructor</span>(val) {
-    <span class="kw">this</span>.data = val;
-    <span class="kw">this</span>.next = <span class="nm">null</span>;
-  }
-}
-
-<span class="cm">// Insert after a given node</span>
-<span class="fn">insertAfter</span>(target, val) {
-  <span class="kw">let</span> cur = head;
-  <span class="kw">while</span> (cur && cur.data !== target)
-    cur = cur.next;
-  <span class="kw">if</span> (!cur) <span class="kw">return</span>;
-  <span class="kw">let</span> node = <span class="kw">new</span> <span class="fn">Node</span>(val);
-  node.next = cur.next;
-  cur.next = node;
-  <span class="cm">// O(n) search + O(1) insert</span>
-}
-
-<span class="cm">// Reverse the list</span>
-<span class="fn">reverse</span>() {
-  <span class="kw">let</span> prev = <span class="nm">null</span>, cur = head;
-  <span class="kw">while</span> (cur) {
-    <span class="kw">let</span> next = cur.next;
-    cur.next = prev;
-    prev = cur;
-    cur = next;
-  }
-  head = prev;
-}</pre>`;
-  } else {
-    cp.innerHTML = `<pre><span class="kw">class</span> <span class="fn">DNode</span> {
-  <span class="fn">constructor</span>(val) {
-    <span class="kw">this</span>.data = val;
-    <span class="kw">this</span>.prev = <span class="nm">null</span>;
-    <span class="kw">this</span>.next = <span class="nm">null</span>;
-  }
-}
-
-<span class="cm">// Insert before a given node</span>
-<span class="fn">insertBefore</span>(target, val) {
-  <span class="kw">let</span> cur = head;
-  <span class="kw">while</span> (cur && cur.data !== target)
-    cur = cur.next;
-  <span class="kw">if</span> (!cur) <span class="kw">return</span>;
-  <span class="kw">let</span> node = <span class="kw">new</span> <span class="fn">DNode</span>(val);
-  node.next = cur;
-  node.prev = cur.prev;
-  <span class="kw">if</span> (cur.prev)
-    cur.prev.next = node;
-  <span class="kw">else</span>
-    head = node;
-  cur.prev = node;
-}
-
-<span class="cm">// Delete using only the node</span>
-<span class="fn">deleteNode</span>(node) {
-  <span class="kw">if</span> (node.prev)
-    node.prev.next = node.next;
-  <span class="kw">if</span> (node.next)
-    node.next.prev = node.prev;
-  <span class="cm">// O(1) — no search needed!</span>
-}</pre>`;
-  }
-}
-
-// ===== OPERATIONS =====
-function llPrepend() {
-  const val = parseInt(document.getElementById('llVal').value);
-  if (isNaN(val)) { log('Enter a value.'); return; }
-  list.unshift(val);
-  highlighted = 0;
-  log(`Added <strong>${val}</strong> at HEAD. O(1) — pointer reassignment only.`, 'highlight');
-  render();
-  setTimeout(() => { highlighted = -1; render(); }, 1500);
-}
-
-function llAppend() {
-  const val = parseInt(document.getElementById('llVal').value);
-  if (isNaN(val)) { log('Enter a value.'); return; }
-  list.push(val);
-  highlighted = list.length - 1;
-  const msg = mode === 'singly'
-    ? `Added <strong>${val}</strong> at TAIL. Traversed ${list.length-1} nodes. O(n)`
-    : `Added <strong>${val}</strong> at TAIL. O(1) — direct tail access in doubly list!`;
-  log(msg, 'highlight');
-  render();
-  setTimeout(() => { highlighted = -1; render(); }, 1500);
-}
-
-function llInsertAfter() {
-  const target = parseInt(document.getElementById('llTarget').value);
-  const val = parseInt(document.getElementById('llNewVal').value);
-  if (isNaN(target) || isNaN(val)) { log('Enter both "after value" and "new value".'); return; }
-  const idx = list.indexOf(target);
-  if (idx === -1) { log(`Value ${target} not found in list.`); return; }
-  list.splice(idx + 1, 0, val);
-  highlighted = idx + 1;
-  log(`Inserted <strong>${val}</strong> after node ${target}. New node placed at position ${idx+1}.`, 'highlight');
-  render();
-  setTimeout(() => { highlighted = -1; render(); }, 1800);
-}
-
-function llInsertBefore() {
-  const target = parseInt(document.getElementById('llBeforeTarget').value);
-  const val = parseInt(document.getElementById('llBeforeNew').value);
-  if (isNaN(target) || isNaN(val)) { log('Enter both "before value" and "new value".'); return; }
-  const idx = list.indexOf(target);
-  if (idx === -1) { log(`Value ${target} not found in list.`); return; }
-  list.splice(idx, 0, val);
-  highlighted = idx;
-  const msg = mode === 'singly'
-    ? `Inserted <strong>${val}</strong> before ${target}. Singly list needed extra traversal to find previous node.`
-    : `Inserted <strong>${val}</strong> before ${target}. Doubly list used .prev pointer — efficient!`;
-  log(msg, 'highlight');
-  render();
-  setTimeout(() => { highlighted = -1; render(); }, 1800);
-}
-
-function llDeleteAfter() {
-  const target = parseInt(document.getElementById('llDelAfterVal').value);
-  if (isNaN(target)) { log('Enter a value to delete after.'); return; }
-  const idx = list.indexOf(target);
-  if (idx === -1) { log(`Value ${target} not found.`); return; }
-  if (idx === list.length - 1) { log(`Node ${target} has no next — nothing to delete after it.`); return; }
-  const deleted = list[idx + 1];
-  list.splice(idx + 1, 1);
-  highlighted = idx;
-  log(`Deleted <strong>${deleted}</strong> (the node after ${target}). Pointer redirected to skip it.`, 'highlight');
-  render();
-  setTimeout(() => { highlighted = -1; render(); }, 1800);
-}
-
-function llDeleteHead() {
-  if (!list.length) { log('List is empty.'); return; }
-  const v = list.shift();
-  log(`Deleted HEAD <strong>${v}</strong>. New HEAD = ${list[0] ?? 'NULL'}. O(1)`, 'highlight');
-  render();
-}
-
-function llDeleteTail() {
-  if (!list.length) { log('List is empty.'); return; }
-  const v = list.pop();
-  const msg = mode === 'singly'
-    ? `Deleted TAIL <strong>${v}</strong>. O(n) — traversed to find second-last in singly list.`
-    : `Deleted TAIL <strong>${v}</strong>. O(1) in doubly list — used tail.prev directly.`;
-  log(msg, 'highlight');
-  render();
-}
-
-function llDeleteValue() {
-  const val = parseInt(document.getElementById('llVal').value);
-  if (isNaN(val)) { log('Enter a value to delete.'); return; }
-  const idx = list.indexOf(val);
-  if (idx === -1) { log(`Value ${val} not found.`); return; }
-  list.splice(idx, 1);
-  log(`Deleted node with value <strong>${val}</strong> from position ${idx}.`, 'highlight');
-  render();
-}
-
-function llSearch() {
-  const val = parseInt(document.getElementById('llVal').value);
-  if (isNaN(val)) { log('Enter a value to search.'); return; }
-  const idx = list.indexOf(val);
-  if (idx === -1) { log(`Value ${val} not found. Traversed all ${list.length} nodes.`); return; }
-  highlighted = idx;
-  log(`Found <strong>${val}</strong> at position ${idx}. Took ${idx+1} steps from HEAD.`, 'success-log');
-  render();
-  setTimeout(() => { highlighted = -1; render(); }, 2000);
-}
-
-function llReverse() {
-  list.reverse();
-  log(`Reversed the list! Every pointer flipped. O(n) time, O(1) space.`, 'success-log');
-  render();
-}
-
-function llReset() {
-  list = [10, 20, 30, 40];
-  highlighted = -1;
-  log('List reset to default.');
-  render();
-}
-
-// Init
-updateCodePanel();
-updateExplanation();
-render();
+function rst(){list=[10,20,30,40];hiIdx=[];render();log('Reset.');hl();}
+rst();
 </script>
-</body>
-</html>
+</body></html>

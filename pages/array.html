@@ -1,10 +1,20 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
 <title>Array — DSA Visualizer</title>
 <link rel="stylesheet" href="../css/style.css">
 <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+.code-line{display:block;padding:2px 10px;border-left:3px solid transparent;transition:background .2s,border-left-color .2s;border-radius:0 4px 4px 0;white-space:pre;font-family:'JetBrains Mono',monospace;font-size:0.77rem;line-height:1.75}
+.code-line.hl{background:rgba(59,130,246,.18);border-left-color:#3b82f6}
+.code-line.hl2{background:rgba(16,185,129,.15);border-left-color:#10b981}
+.kw{color:#c792ea}.fn{color:#82aaff}.cm{color:#546e7a;font-style:italic}.nm{color:#f78c6c}.st{color:#c3e88d}.ty{color:#7dcfff}.op{color:#89ddff}
+.step-controls{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:6px}
+.btn-step{background:rgba(167,139,250,0.12);border:1px solid rgba(167,139,250,0.4);color:#c4b5fd;padding:6px 14px;border-radius:6px;cursor:pointer;font-family:inherit;font-size:0.82rem;transition:all .15s}
+.btn-step:hover{background:rgba(167,139,250,0.22);border-color:#a78bfa}
+.btn-step:disabled{opacity:0.35;cursor:not-allowed}
+</style>
 </head>
 <body>
 <nav class="navbar">
@@ -15,124 +25,121 @@
   <div class="viz-header">
     <a href="../index.html" class="back-link">← Back to Home</a>
     <h1>Array</h1>
-    <p class="subtitle">A collection of elements stored in contiguous memory locations, accessible via an index.</p>
-    <div class="complexity-badges">
-      <span class="badge badge-green">Access O(1)</span>
-      <span class="badge badge-blue">Search O(n)</span>
-      <span class="badge badge-yellow">Insert O(n)</span>
-    </div>
+    <p class="subtitle">Contiguous block of memory — O(1) access, O(n) insert/delete.</p>
+    <div class="complexity-badges"><span class="badge badge-green">Access O(1)</span><span class="badge badge-blue">Insert O(n)</span><span class="badge badge-blue">Delete O(n)</span></div>
   </div>
   <div class="viz-layout">
     <div>
       <div class="viz-panel">
-        <div class="panel-title">Visualization</div>
-        <div class="viz-canvas">
-          <div style="width:100%">
-            <div class="array-viz" id="arrayViz" style="margin-bottom:28px"></div>
-          </div>
-        </div>
+        <div class="panel-title">Array — contiguous memory blocks</div>
+<div class="viz-canvas" style="flex-direction:column;gap:1rem">
+  <div class="array-viz" id="arrv"></div>
+  <div id="arrMsg" style="text-align:center;font-family:JetBrains Mono,monospace;font-size:0.8rem;color:var(--text-muted);min-height:20px"></div>
+</div>
         <div class="controls">
           <div class="control-row">
-            <input class="ctrl-input" id="arrVal" type="number" placeholder="Value" min="0" max="99">
-            <input class="ctrl-input" id="arrIdx" type="number" placeholder="Index" min="0" max="7">
-            <button class="ctrl-btn" onclick="arrInsert()">Insert</button>
-          </div>
-          <div class="control-row">
-            <button class="ctrl-btn secondary" onclick="arrAccess()">Access Index</button>
-            <button class="ctrl-btn danger" onclick="arrDelete()">Delete Index</button>
-            <button class="ctrl-btn secondary" onclick="arrReset()">Reset</button>
-          </div>
+  <input class="ctrl-input" id="idx" type="number" placeholder="Index" min="0" style="width:70px">
+  <input class="ctrl-input" id="val" type="number" placeholder="Value">
+  <button class="ctrl-btn" onclick="get()">Get</button>
+  <button class="ctrl-btn" onclick="ins()">Insert at</button>
+  <button class="ctrl-btn danger" onclick="del()">Delete at</button>
+  <button class="ctrl-btn secondary" onclick="rst()">Reset</button>
+</div>
+<div class="step-controls">
+  <span style="font-size:0.78rem;color:var(--text-muted)">Speed:</span>
+  <input type="range" id="spd" min="200" max="1200" value="600" style="width:100px">
+  <span style="font-size:0.78rem;color:var(--text-muted)">Fast</span>
+</div>
         </div>
-        <div class="info-log" id="arrLog"><div class="log-entry">Array initialized with 6 elements. Click any operation above.</div></div>
+        <div class="info-log" id="log"><div class="log-entry">Ready — use Step to go one step at a time, or Auto to run fully.</div></div>
       </div>
-      <div class="explanation" style="margin-top:1rem">
-        <p><strong>What is an Array?</strong> An array stores elements in a fixed block of memory. Each element sits at a specific <strong>index</strong> starting from 0. Because the memory is contiguous, you can jump to any element instantly using its index — that's why access is <strong>O(1)</strong>. However, inserting or deleting requires shifting elements, making it <strong>O(n)</strong>.</p>
-      </div>
+      <div class="explanation" style="margin-top:1rem"><p>Each element is stored at a fixed offset from the base address, so <code>arr[i]</code> is always one multiplication away — O(1). Inserting or deleting in the middle requires shifting all subsequent elements.</p></div>
     </div>
     <div>
       <div class="viz-panel">
-        <div class="panel-title">How it works in memory</div>
-        <div class="code-panel">
-          <pre><span class="cm">// Array in memory</span>
-Index:  [<span class="nm">0</span>] [<span class="nm">1</span>] [<span class="nm">2</span>] [<span class="nm">3</span>]
-Value:  [<span class="nm">5</span>] [<span class="nm">3</span>] [<span class="nm">8</span>] [<span class="nm">1</span>]
-Addr: 100 104 108 112
-
-<span class="cm">// Access element at index i</span>
-<span class="kw">address</span> = base + (i × size)
-<span class="cm">// 100 + (2 × 4) = 108 → value 8</span>
-
-<span class="cm">// JavaScript</span>
-<span class="kw">let</span> arr = [<span class="nm">5</span>, <span class="nm">3</span>, <span class="nm">8</span>, <span class="nm">1</span>];
-arr[<span class="nm">2</span>];      <span class="cm">// → 8, O(1)</span>
-arr.<span class="fn">push</span>(<span class="nm">9</span>); <span class="cm">// → end, O(1)</span>
-arr.<span class="fn">splice</span>(<span class="nm">1</span>,<span class="nm">0</span>,<span class="nm">7</span>); <span class="cm">// insert, O(n)</span></pre>
-        </div>
-        <div class="panel-title" style="margin-top:1rem">Operations</div>
-        <div class="stepper" style="padding:1rem">
-          <div class="step-item active-step"><div class="step-num">1</div><div class="step-text"><strong>Access:</strong> Directly jump using index formula. O(1)</div></div>
-          <div class="step-item"><div class="step-num">2</div><div class="step-text"><strong>Insert at end:</strong> Place after last element. O(1)</div></div>
-          <div class="step-item"><div class="step-num">3</div><div class="step-text"><strong>Insert at index:</strong> Shift all elements right first. O(n)</div></div>
-          <div class="step-item"><div class="step-num">4</div><div class="step-text"><strong>Delete:</strong> Remove and shift elements left. O(n)</div></div>
-        </div>
+        <div class="panel-title">Pseudocode <small style="color:var(--text-muted);font-weight:400;font-size:0.7rem;margin-left:6px">— highlighted lines follow the animation</small></div>
+        <div class="code-panel" style="padding:0.4rem 0;overflow-x:auto"><code>
+<span class="code-line" id="L1">ARRAY(A, n)  // fixed-size, n elements</span>
+<span class="code-line" id="L2"></span>
+<span class="code-line" id="L3">// Access — O(1) direct address</span>
+<span class="code-line" id="L4">GET(A, i)</span>
+<span class="code-line" id="L5">1  return A[i]</span>
+<span class="code-line" id="L6"></span>
+<span class="code-line" id="L7">// Insert at index — O(n) shift right</span>
+<span class="code-line" id="L8">INSERT-AT(A, idx, val)</span>
+<span class="code-line" id="L9">1  for i = size downto idx + 1</span>
+<span class="code-line" id="L10">2      A[i] = A[i-1]     // shift right</span>
+<span class="code-line" id="L11">3  A[idx] = val</span>
+<span class="code-line" id="L12">4  size = size + 1</span>
+<span class="code-line" id="L13"></span>
+<span class="code-line" id="L14">// Delete at index — O(n) shift left</span>
+<span class="code-line" id="L15">DELETE-AT(A, idx)</span>
+<span class="code-line" id="L16">1  for i = idx to size - 2</span>
+<span class="code-line" id="L17">2      A[i] = A[i+1]     // shift left</span>
+<span class="code-line" id="L18">3  size = size - 1</span>
+        </code></div>
       </div>
     </div>
   </div>
 </div>
 <script>
-let arr = [12, 35, 7, 48, 21, 5];
-let highlighted = -1;
 
+const sleep = ms => new Promise(r => setTimeout(r, ms));
+const spd = () => 1400 - parseInt(document.getElementById('spd')?.value ?? 700);
+function hl(...ids) {
+  document.querySelectorAll('.code-line').forEach(l => l.classList.remove('hl','hl2'));
+  ids.forEach(n => { const e = document.getElementById('L'+n); if(e) e.classList.add('hl'); });
+}
+function hl2(...ids) { ids.forEach(n => { const e = document.getElementById('L'+n); if(e) e.classList.add('hl2'); }); }
+function log(m, t='') {
+  const e = document.getElementById('log');
+  if(e) e.innerHTML = `<div class="log-entry ${t}">${m}</div>` + e.innerHTML;
+}
+
+
+let arr=[15,8,23,4,42,16], hi=[], msg='';
 function render() {
-  const viz = document.getElementById('arrayViz');
-  viz.innerHTML = arr.map((v,i) => `
-    <div class="arr-cell ${i===highlighted?'active':''}" style="transition:all 0.3s">
-      ${v}
-      <span class="idx">${i}</span>
-    </div>`).join('');
+  document.getElementById('arrv').innerHTML = arr.map((v,i) =>
+    `<div class="arr-cell${hi.includes(i)?' active':''}" style="width:48px;height:48px">${v}<span class="idx">${i}</span></div>`
+  ).join('');
+  document.getElementById('arrMsg').textContent = msg;
 }
-
-function log(msg, type='') {
-  const el = document.getElementById('arrLog');
-  el.innerHTML = `<div class="log-entry ${type}">${msg}</div>` + el.innerHTML;
+async function get() {
+  const i=parseInt(document.getElementById('idx').value);
+  if(isNaN(i)||i<0||i>=arr.length){log('Enter valid index.');return;}
+  hl(3,4,5); hi=[i]; msg=`arr[${i}] = ${arr[i]}`; render();
+  log(`Access arr[${i}] = <strong>${arr[i]}</strong>. Direct address — O(1).`,'success-log');
+  await sleep(spd()*1.5); hi=[]; msg=''; render();
 }
-
-function arrInsert() {
-  const val = parseInt(document.getElementById('arrVal').value);
-  const idx = parseInt(document.getElementById('arrIdx').value);
-  if (isNaN(val)) { log('Enter a value first.'); return; }
-  if (!isNaN(idx) && idx >= 0 && idx <= arr.length) {
-    arr.splice(idx, 0, val);
-    highlighted = idx;
-    log(`Inserted ${val} at index ${idx}. Shifted ${arr.length-idx-1} elements right.`, 'highlight');
-  } else {
-    arr.push(val);
-    highlighted = arr.length - 1;
-    log(`Inserted ${val} at end (index ${arr.length-1}).`, 'highlight');
+async function ins() {
+  const idx=parseInt(document.getElementById('idx').value), v=parseInt(document.getElementById('val').value);
+  if(isNaN(idx)||isNaN(v)||idx<0||idx>arr.length){log('Enter valid index and value.');return;}
+  if(arr.length>=10){log('Max 10 elements for display.');return;}
+  log(`insertAt(${idx}, ${v}): shift elements right from index ${idx}.`,'highlight');
+  arr.splice(idx,0,null); render(); await sleep(spd()/2);
+  for(let i=arr.length-1;i>idx;i--){
+    hl(9,10,11); hi=[i,i-1]; msg=`arr[${i}] = arr[${i-1}]`; render();
+    await sleep(spd());
   }
-  render();
-  setTimeout(()=>{ highlighted=-1; render(); }, 1500);
+  hl(12); arr[idx]=v; hi=[idx]; msg=`arr[${idx}] = ${v}`; render();
+  log(`Inserted <strong>${v}</strong> at index ${idx}.`,'highlight');
+  await sleep(spd()); hl(13); hi=[]; msg=''; render();
 }
-
-function arrAccess() {
-  const idx = parseInt(document.getElementById('arrIdx').value);
-  if (isNaN(idx) || idx < 0 || idx >= arr.length) { log('Enter a valid index (0 to ' + (arr.length-1) + ')'); return; }
-  highlighted = idx;
-  log(`Accessing index ${idx} → value is <strong>${arr[idx]}</strong>. Memory address jump: O(1)`, 'highlight');
-  render();
-  setTimeout(()=>{ highlighted=-1; render(); }, 1500);
+async function del() {
+  const idx=parseInt(document.getElementById('idx').value);
+  if(isNaN(idx)||idx<0||idx>=arr.length){log('Enter valid index.');return;}
+  const removed=arr[idx];
+  log(`deleteAt(${idx}): shift elements left starting at ${idx}.`,'highlight');
+  hi=[idx]; render(); await sleep(spd());
+  for(let i=idx;i<arr.length-1;i++){
+    hl(17,18,19); hi=[i,i+1]; msg=`arr[${i}] = arr[${i+1}]`; render();
+    arr[i]=arr[i+1]; await sleep(spd());
+  }
+  hl(20); arr.pop(); hi=[]; msg=''; render();
+  log(`Deleted <strong>${removed}</strong> from index ${idx}.`,'highlight');
 }
+function rst(){arr=[15,8,23,4,42,16];hi=[];msg='';render();log('Array reset.');hl();}
+rst();
 
-function arrDelete() {
-  const idx = parseInt(document.getElementById('arrIdx').value);
-  if (isNaN(idx) || idx < 0 || idx >= arr.length) { log('Enter a valid index to delete.'); return; }
-  const val = arr[idx];
-  arr.splice(idx, 1);
-  log(`Deleted value ${val} from index ${idx}. Shifted ${arr.length-idx} elements left.`, 'highlight');
-  render();
-}
-
-function arrReset() { arr = [12,35,7,48,21,5]; highlighted=-1; render(); log('Array reset to default.'); }
-render();
 </script>
 </body></html>

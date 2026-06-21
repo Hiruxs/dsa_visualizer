@@ -291,6 +291,27 @@ body { background: var(--bg-primary); color: var(--text-primary); font-family: v
 .node-text { font-family: 'JetBrains Mono', monospace; font-size: 13px; fill: var(--text-primary); text-anchor: middle; dominant-baseline: central; }
 .edge-line { stroke: var(--border); stroke-width: 2; }
 
+.code-line {
+  display: block;
+  padding: 1px 8px;
+  border-left: 3px solid transparent;
+  transition: background 0.22s, border-color 0.22s;
+  border-radius: 0 4px 4px 0;
+  white-space: pre;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.78rem;
+  line-height: 1.7;
+}
+.code-line.hl {
+  background: rgba(59, 130, 246, 0.18);
+  border-left-color: #3b82f6;
+}
+.code-line.hl2 {
+  background: rgba(16, 185, 129, 0.13);
+  border-left-color: #10b981;
+}
+
+
 /* RESPONSIVE */
 @media (max-width: 600px) {
   .navbar { padding: 1rem; }
@@ -301,3 +322,4 @@ body { background: var(--bg-primary); color: var(--text-primary); font-family: v
   .section { padding: 4rem 1rem; }
   .viz-layout { padding: 1rem 1rem 3rem; }
 }
+
