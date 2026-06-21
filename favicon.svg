@@ -1,0 +1,49 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#0f172a"/>
+      <stop offset="100%" style="stop-color:#1e293b"/>
+    </linearGradient>
+    <linearGradient id="blue" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#60a5fa"/>
+      <stop offset="100%" style="stop-color:#3b82f6"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Background rounded square -->
+  <rect width="64" height="64" rx="14" fill="url(#bg)"/>
+
+  <!-- Tree nodes — BST shape -->
+  <!-- Root node -->
+  <circle cx="32" cy="14" r="7" fill="url(#blue)" opacity="0.95"/>
+
+  <!-- Left child -->
+  <circle cx="17" cy="34" r="6" fill="#3b82f6" opacity="0.8"/>
+
+  <!-- Right child -->
+  <circle cx="47" cy="34" r="6" fill="#3b82f6" opacity="0.8"/>
+
+  <!-- Left-left leaf -->
+  <circle cx="10" cy="52" r="5" fill="#2563eb" opacity="0.65"/>
+
+  <!-- Left-right leaf -->
+  <circle cx="24" cy="52" r="5" fill="#2563eb" opacity="0.65"/>
+
+  <!-- Right leaf -->
+  <circle cx="47" cy="52" r="5" fill="#2563eb" opacity="0.65"/>
+
+  <!-- Edges -->
+  <!-- Root → Left -->
+  <line x1="27" y1="19" x2="21" y2="29" stroke="#60a5fa" stroke-width="2" opacity="0.6" stroke-linecap="round"/>
+  <!-- Root → Right -->
+  <line x1="37" y1="19" x2="43" y2="29" stroke="#60a5fa" stroke-width="2" opacity="0.6" stroke-linecap="round"/>
+  <!-- Left → LL -->
+  <line x1="13" y1="39" x2="11" y2="47" stroke="#3b82f6" stroke-width="1.8" opacity="0.5" stroke-linecap="round"/>
+  <!-- Left → LR -->
+  <line x1="21" y1="39" x2="23" y2="47" stroke="#3b82f6" stroke-width="1.8" opacity="0.5" stroke-linecap="round"/>
+  <!-- Right → R -->
+  <line x1="47" y1="40" x2="47" y2="47" stroke="#3b82f6" stroke-width="1.8" opacity="0.5" stroke-linecap="round"/>
+
+  <!-- Subtle glow ring on root -->
+  <circle cx="32" cy="14" r="9" fill="none" stroke="#60a5fa" stroke-width="1.2" opacity="0.3"/>
+</svg>
